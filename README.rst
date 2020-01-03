@@ -1,6 +1,6 @@
-===========
-pySonoffLAN
-===========
+=============
+pySonoffLANR3
+=============
 
 
 .. image:: https://img.shields.io/pypi/v/pysonofflanr3.svg
@@ -32,9 +32,12 @@ pySonoffLAN
     :alt: Updates
 
 .. image:: https://pyup.io/repos/github/mattsaxon/pysonofflan/python-3-shield.svg
-     :target: https://pyup.io/repos/github/mattsaxon/pysonofflan/
-     :alt: Python 3
+    :target: https://pyup.io/repos/github/mattsaxon/pysonofflan/
+    :alt: Python 3
 
+.. image:: https://img.shields.io/badge/say-thanks-ff69b4.svg
+    :target: https://www.buymeacoffee.com/XTOsBAc
+    :alt: Say Thanks
 
 Control Sonoff devices running original firmware, in LAN mode.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

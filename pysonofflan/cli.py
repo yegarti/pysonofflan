@@ -6,22 +6,22 @@ import click
 import click_log
 from click_log import ClickHandler
 
-from pysonofflan import (SonoffSwitch, Discover)
+from pysonofflan import SonoffSwitch, Discover
 
 if sys.version_info < (3, 5):
-    print("To use this script you need python 3.5 or newer! got %s" %
-          sys.version_info)
+    print("To use this script you need python 3.5 or newer! got %s"
+          % sys.version_info)
     sys.exit(1)
 
 
 class CustomColorFormatter(click_log.ColorFormatter):
     colors = {
-        'error': dict(fg='red'),
-        'exception': dict(fg='red'),
-        'critical': dict(fg='red'),
-        'info': dict(fg='bright_green'),
-        'debug': dict(fg='blue'),
-        'warning': dict(fg='yellow')
+        "error": dict(fg="red"),
+        "exception": dict(fg="red"),
+        "critical": dict(fg="red"),
+        "info": dict(fg="bright_green"),
+        "debug": dict(fg="blue"),
+        "warning": dict(fg="yellow"),
     }
 
     def format(self, record):
@@ -31,10 +31,10 @@ class CustomColorFormatter(click_log.ColorFormatter):
 
             prefix = self.formatTime(record, self.datefmt) + " - "
             if level in self.colors:
-                prefix += click.style('{}: '.format(level),
+                prefix += click.style("{}: ".format(level),
                                       **self.colors[level])
 
-            msg = '\n'.join(prefix + x for x in msg.splitlines())
+            msg = "\n".join(prefix + x for x in msg.splitlines())
             return msg
         return logging.Formatter.format(self, record)
 
@@ -51,17 +51,33 @@ pass_config = click.make_pass_decorator(dict, ensure=True)
 
 
 @click.group(invoke_without_command=True)
-@click.option('--host', envvar="PYSONOFFLAN_HOST", required=False,
-              help='IP address or hostname of the device to connect to.')
-@click.option('--device_id', envvar="PYSONOFFLAN_device_id", required=False,
-              help='Device ID of the device to connect to.')
-@click.option('--api_key', envvar="PYSONOFFLAN_api_key", required=False,
-              help='api key for the device to connect to.')              
-@click.option('--inching', envvar="PYSONOFFLAN_inching", required=False,
-              help='Number of seconds of "on" time if this is an '
-                   'Inching/Momentary switch.')
+@click.option(
+    "--host",
+    envvar="PYSONOFFLAN_HOST",
+    required=False,
+    help="IP address or hostname of the device to connect to.",
+)
+@click.option(
+    "--device_id",
+    envvar="PYSONOFFLAN_device_id",
+    required=False,
+    help="Device ID of the device to connect to.",
+)
+@click.option(
+    "--api_key",
+    envvar="PYSONOFFLAN_api_key",
+    required=False,
+    help="api key for the device to connect to.",
+)
+@click.option(
+    "--inching",
+    envvar="PYSONOFFLAN_inching",
+    required=False,
+    help='Number of seconds of "on" time if this is an '
+         "Inching/Momentary switch.",
+)
 @click.pass_context
-@click_log.simple_verbosity_option(logger, '--loglevel', '-l')
+@click_log.simple_verbosity_option(logger, "--loglevel", "-l")
 @click.version_option()
 def cli(ctx, host, device_id, api_key, inching):
     """A cli tool for controlling Sonoff Smart Switches/Plugs in LAN Mode."""
@@ -73,7 +89,13 @@ def cli(ctx, host, device_id, api_key, inching):
         click.echo(ctx.get_help())
         sys.exit(1)
 
-    ctx.obj = {"host": host, "device_id": device_id, "api_key": api_key, "inching": inching}
+    ctx.obj = {
+        "host": host,
+        "device_id": device_id,
+        "api_key": api_key,
+        "inching": inching,
+    }
+
 
 @cli.command()
 def discover():
@@ -82,10 +104,16 @@ def discover():
         "Attempting to discover Sonoff LAN Mode devices "
         "on the local network, please wait..."
     )
-    found_devices = asyncio.get_event_loop().run_until_complete(
-        Discover.discover(logger)).items()
+    found_devices = (
+        asyncio.get_event_loop().run_until_complete(
+                Discover.discover(logger)).items()
+    )
     for found_device_id, ip in found_devices:
-        logger.debug("Found Sonoff LAN Mode device %s at socket %s" % (found_device_id,ip))
+        logger.debug(
+            "Found Sonoff LAN Mode device %s at socket %s"
+            % (found_device_id, ip)
+        )
+
 
 @cli.command()
 @pass_config
@@ -99,13 +127,13 @@ def state(config: dict):
 
                 device.shutdown_event_loop()
 
-    logger.info("Initialising SonoffSwitch with host %s" % config['host'])
+    logger.info("Initialising SonoffSwitch with host %s" % config["host"])
     SonoffSwitch(
-        host=config['host'],
+        host=config["host"],
         callback_after_update=state_callback,
         logger=logger,
-        device_id=config['device_id'],
-        api_key=config['api_key']
+        device_id=config["device_id"],
+        api_key=config["api_key"],
     )
 
 
@@ -113,13 +141,14 @@ def state(config: dict):
 @pass_config
 def on(config: dict):
     """Turn the device on."""
-    switch_device(config, config['inching'], 'on')
+    switch_device(config, config["inching"], "on")
+
 
 @cli.command()
 @pass_config
 def off(config: dict):
     """Turn the device off."""
-    switch_device(config, config['inching'], 'off')
+    switch_device(config, config["inching"], "off")
 
 
 @cli.command()
@@ -131,22 +160,22 @@ def listen(config: dict):
         if self.basic_info is not None:
             print_device_details(self)
 
-            if self.shared_state['callback_counter'] == 0:
-                logger.info(
-                    "Listening for updates forever... Press CTRL+C to quit.")
+            if self.shared_state["callback_counter"] == 0:
+                logger.info("Listening for updates forever...' \
+                'Press CTRL+C to quit.")
 
-        self.shared_state['callback_counter'] += 1
+        self.shared_state["callback_counter"] += 1
 
-    logger.info("Initialising SonoffSwitch with host %s" % config['host'])
+    logger.info("Initialising SonoffSwitch with host %s" % config["host"])
 
-    shared_state = {'callback_counter': 0}
+    shared_state = {"callback_counter": 0}
     SonoffSwitch(
-        host=config['host'],
+        host=config["host"],
         callback_after_update=state_callback,
         shared_state=shared_state,
         logger=logger,
-        device_id=config['device_id'],
-        api_key=config['api_key']
+        device_id=config["device_id"],
+        api_key=config["api_key"],
     )
 
 
@@ -155,18 +184,21 @@ def print_device_details(device):
         device_id = device.device_id
 
         logger.info(
-            click.style("== Device: %s (%s) ==" % (device_id, device.host),
-                        bold=True)
+            click.style("== Device: %s (%s) =="
+                        % (device_id, device.host), bold=True)
         )
 
-        logger.info("State: " + click.style(
-            "ON" if device.is_on else "OFF",
-            fg="green" if device.is_on else "red")
-                    )
+        logger.info(
+            "State: "
+            + click.style(
+                "ON" if device.is_on else "OFF",
+                fg="green" if device.is_on else "red"
+            )
+        )
 
 
 def switch_device(config: dict, inching, new_state):
-    logger.info("Initialising SonoffSwitch with host %s" % config['host'])
+    logger.info("Initialising SonoffSwitch with host %s" % config["host"])
 
     async def update_callback(device: SonoffSwitch):
         if device.basic_info is not None:
@@ -181,7 +213,7 @@ def switch_device(config: dict, inching, new_state):
                             device.shutdown_event_loop()
                         else:
                             await device.turn_off()
-                            
+
                     elif device.is_off:
                         if new_state == "off":
                             device.shutdown_event_loop()
@@ -189,19 +221,21 @@ def switch_device(config: dict, inching, new_state):
                             await device.turn_on()
 
                 else:
-                    logger.info("Inching device activated by switching ON for "
-                                "%ss" % inching)
+                    logger.info(
+                        "Inching device activated by switching ON for %ss"
+                        % inching
+                    )
 
     SonoffSwitch(
-        host=config['host'],
+        host=config["host"],
         callback_after_update=update_callback,
         inching_seconds=int(inching) if inching else None,
         logger=logger,
-        device_id=config['device_id'],
-        api_key=config['api_key']
+        device_id=config["device_id"],
+        api_key=config["api_key"],
     )
 
 
 if __name__ == "__main__":
-# pylint: disable=no-value-for-parameter
+    # pylint: disable=no-value-for-parameter
     cli()

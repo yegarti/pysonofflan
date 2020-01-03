@@ -220,7 +220,7 @@ if __name__ == "__main__":
         api_key = sys.argv[3]
         ip = sys.argv[4]
         port = int(sys.argv[5])
-    except: # noqa
+    except IndexError:
         pass
 
     start_device(name, sonoff_type, api_key, ip, port)

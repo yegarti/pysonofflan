@@ -14,18 +14,20 @@ from .client import SonoffLANModeClient
 
 
 class SonoffDevice(object):
-    def __init__(self,
-                 host: str,
-                 callback_after_update: Callable[..., Awaitable[None]] = None,
-                 shared_state: Dict = None,
-                 logger=None,
-                 loop=None,
-                 ping_interval=SonoffLANModeClient.DEFAULT_PING_INTERVAL,
-                 timeout=SonoffLANModeClient.DEFAULT_TIMEOUT,
-                 context: str = None,
-                 device_id: str = "",
-                 api_key: str = "",
-                 outlet: int = None) -> None:
+    def __init__(
+        self,
+        host: str,
+        callback_after_update: Callable[..., Awaitable[None]] = None,
+        shared_state: Dict = None,
+        logger=None,
+        loop=None,
+        ping_interval=SonoffLANModeClient.DEFAULT_PING_INTERVAL,
+        timeout=SonoffLANModeClient.DEFAULT_TIMEOUT,
+        context: str = None,
+        device_id: str = "",
+        api_key: str = "",
+        outlet: int = None,
+    ) -> None:
         """
         Create a new SonoffDevice instance.
 
@@ -51,21 +53,24 @@ class SonoffDevice(object):
 
         # Ctrl-C (KeyboardInterrupt) does not work well on Windows
         # This module solve that issue with wakeup coroutine.
-        # https://stackoverflow.com/questions/24774980/why-cant-i-catch-sigint-when-asyncio-event-loop-is-running/24775107#24775107
-        # code lifted from https://gist.github.com/lambdalisue/05d5654bd1ec04992ad316d50924137c
-        if sys.platform.startswith('win'):
-            def hotfix(loop: asyncio.AbstractEventLoop) -> asyncio.AbstractEventLoop:
+        # noqa https://stackoverflow.com/questions/24774980/why-cant-i-catch-sigint-when-asyncio-event-loop-is-running/24775107#24775107
+        # noqa code lifted from https://gist.github.com/lambdalisue/05d5654bd1ec04992ad316d50924137c
+        if sys.platform.startswith("win"):
+
+            def hotfix(loop: asyncio.AbstractEventLoop) -> \
+                       asyncio.AbstractEventLoop:
                 loop.call_soon(_wakeup, loop, 1.0)
                 return loop
 
-            def _wakeup(loop: asyncio.AbstractEventLoop, delay: float=1.0) -> None:
+            def _wakeup(loop: asyncio.AbstractEventLoop,
+                        delay: float = 1.0) -> None:
                 loop.call_later(delay, _wakeup, loop, delay)
 
         else:
             # Do Nothing on non Windows
-            def hotfix(loop: asyncio.AbstractEventLoop) -> asyncio.AbstractEventLoop:
+            def hotfix(loop: asyncio.AbstractEventLoop) -> \
+                       asyncio.AbstractEventLoop:
                 return loop
-
 
         try:
             if self.loop is None:
@@ -75,7 +80,8 @@ class SonoffDevice(object):
                 asyncio.set_event_loop(self.loop)
 
             self.logger.debug(
-                'Initializing SonoffLANModeClient class in SonoffDevice')
+                "Initializing SonoffLANModeClient class in SonoffDevice"
+            )
             self.client = SonoffLANModeClient(
                 host,
                 self.handle_message,
@@ -85,7 +91,7 @@ class SonoffDevice(object):
                 loop=self.loop,
                 device_id=device_id,
                 api_key=api_key,
-                outlet=outlet
+                outlet=outlet,
             )
 
             self.message_ping_event = asyncio.Event()
@@ -93,21 +99,22 @@ class SonoffDevice(object):
             self.params_updated_event = asyncio.Event()
 
             self.client.connect()
-             
-            self.tasks.append(
-                self.loop.create_task(self.send_availability_loop()))
 
-            self.send_updated_params_task = \
-                self.loop.create_task(self.send_updated_params_loop())
+            self.tasks.append(self.loop.create_task(
+                              self.send_availability_loop()
+                              ))
+
+            self.send_updated_params_task = self.loop.create_task(
+                self.send_updated_params_loop()
+            )
             self.tasks.append(self.send_updated_params_task)
 
             if self.new_loop:
-                hotfix(self.loop)  ## see Cltr-C hotfix earlier in routine
+                hotfix(self.loop)  # see Cltr-C hotfix earlier in routine
                 self.loop.run_until_complete(self.send_updated_params_task)
 
         except asyncio.CancelledError:
-            self.logger.debug('SonoffDevice loop ended, returning')
-
+            self.logger.debug("SonoffDevice loop ended, returning")
 
     def calculate_retry(self, retry_count):
 
@@ -122,133 +129,156 @@ class SonoffDevice(object):
             return wait_seconds[retry_count]
 
         except Exception as ex:
-            self.logger.error('Unexpected error in wait_before_retry(): %s',
-                format(ex))
-
+            self.logger.error("Unexpected error in wait_before_retry(): %s",
+                              format(ex))
 
     async def send_availability_loop(self):
 
-        self.logger.debug('enter send_availability_loop()')
+        self.logger.debug("enter send_availability_loop()")
 
         try:
             while True:
 
-                self.logger.debug('waiting for connection')
+                self.logger.debug("waiting for connection")
 
                 await self.client.connected_event.wait()
                 self.client.disconnected_event.clear()
 
-                self.logger.debug('connected event, sending update')
+                self.logger.debug("connected event, sending update")
 
-                # this update doesn't need to be sent as handle_message will call it at the end
-                #if self.callback_after_update is not None:
+                # no need to send thos update as handle_message calls it
+                # if self.callback_after_update is not None:
                 #    await self.callback_after_update(self)
 
-                self.logger.debug('waiting for disconnection')
+                self.logger.debug("waiting for disconnection")
 
                 await self.client.disconnected_event.wait()
                 self.client.connected_event.clear()
 
-                self.logger.debug('disconnected event, sending update')
+                self.logger.debug("disconnected event, sending update")
 
                 if self.callback_after_update is not None:
                     await self.callback_after_update(self)
 
         finally:
-            self.logger.debug('exiting send_availability_loop()')
-
+            self.logger.debug("exiting send_availability_loop()")
 
     async def send_updated_params_loop(self):
 
         self.logger.debug(
-            'send_updated_params_loop is active on the event loop')
+            "send_updated_params_loop is active on the event loop"
+        )
 
         retry_count = 0
 
         try:
 
             self.logger.debug(
-                'Starting loop waiting for device params to change')
+                "Starting loop waiting for device params to change")
 
             while True:
                 self.logger.debug(
-                    'send_updated_params_loop now awaiting event')
+                    "send_updated_params_loop now awaiting event")
 
                 await self.params_updated_event.wait()
 
                 await self.client.connected_event.wait()
-                self.logger.debug('Connected!')                
+                self.logger.debug("Connected!")
 
                 update_message = self.client.get_update_payload(
-                    self.device_id,
-                    self.params
+                    self.device_id, self.params
                 )
 
                 try:
                     self.message_ping_event.clear()
                     self.message_acknowledged_event.clear()
 
-                    await self.loop.run_in_executor(None,
-                        self.client.send_switch, update_message)
-                            
+                    await self.loop.run_in_executor(
+                        None, self.client.send_switch, update_message
+                    )
+
                     await asyncio.wait_for(
                         self.message_ping_event.wait(),
-                        self.calculate_retry(retry_count))
+                        self.calculate_retry(retry_count),
+                    )
 
                     if self.message_acknowledged_event.is_set():
                         self.params_updated_event.clear()
-                        self.logger.debug('Update message sent, '
-                            'event cleared, should loop now')
+                        self.logger.debug(
+                            "Update message sent, event cleared, looping"
+                        )
                         retry_count = 0
                     else:
                         self.logger.info(
                             "we didn't get a confirmed acknowledgement, "
-                            "state has changed in between retry!")
+                            "state has changed in between retry!"
+                        )
                         retry_count += 1
-                    
+
                 except asyncio.TimeoutError:
                     self.logger.warn(
-                        'Device: %s. Update message not received in timeout period, retry', self.device_id)
+                        "Device: %s. "
+                        "Update message not received in timeout period, retry",
+                        self.device_id,
+                    )
                     retry_count += 1
 
                 except asyncio.CancelledError:
-                    self.logger.debug('send_updated_params_loop cancelled')
+                    self.logger.debug("send_updated_params_loop cancelled")
                     break
 
                 except OSError as ex:
                     if retry_count == 0:
-                        self.logger.warn('Connection issue for device %s: %s', self.device_id, format(ex))
+                        self.logger.warn(
+                            "Connection issue for device %s: %s",
+                            self.device_id,
+                            format(ex),
+                        )
                     else:
-                        self.logger.debug('Connection issue for device %s: %s', self.device_id, format(ex))
+                        self.logger.debug(
+                            "Connection issue for device %s: %s",
+                            self.device_id,
+                            format(ex),
+                        )
 
                     await asyncio.sleep(self.calculate_retry(retry_count))
                     retry_count += 1
 
                 except Exception as ex:
-                    self.logger.error('send_updated_params_loop() [inner block] Unexpected error for device %s: %s %s', self.device_id, format(ex), traceback.format_exc)
+                    self.logger.error(
+                        "send_updated_params_loop() [inner block] "
+                        "Unexpected error for device %s: %s %s",
+                        self.device_id,
+                        format(ex),
+                        traceback.format_exc,
+                    )
                     break
 
         except asyncio.CancelledError:
-            self.logger.debug('send_updated_params_loop cancelled')
+            self.logger.debug("send_updated_params_loop cancelled")
 
         except Exception as ex:
-            self.logger.error('send_updated_params_loop() [outer block] Unexpected error for device %s: %s %s', self.device_id, format(ex), traceback.format_exc)
+            self.logger.error(
+                "send_updated_params_loop() [outer block] "
+                "Unexpected error for device %s: %s %s",
+                self.device_id,
+                format(ex),
+                traceback.format_exc,
+            )
 
         finally:
-            self.logger.debug('send_updated_params_loop finally block reached')
-
+            self.logger.debug("send_updated_params_loop finally block reached")
 
     def update_params(self, params):
 
         if self.params != params:
 
             self.logger.debug(
-                'Scheduling params update message to device: %s' % params)
+                "Scheduling params update message to device: %s" % params)
             self.params = params
             self.params_updated_event.set()
         else:
-            self.logger.debug('unnecessary update received, ignoring')
-
+            self.logger.debug("unnecessary update received, ignoring")
 
     async def handle_message(self, message):
         """
@@ -257,37 +287,43 @@ class SonoffDevice(object):
         """
 
         try:
-            self.logger.debug('enter handle_message() %s', message)
+            self.logger.debug("enter handle_message() %s", message)
 
             self.message_ping_event.set()
 
             response = json.loads(message)
 
-            self.logger.debug('loaded json')
-            self.logger.debug('outlet %s', self.outlet)
+            self.logger.debug("loaded json")
+            self.logger.debug("outlet %s", self.outlet)
 
-            if self.client.type == b'strip':
+            if self.client.type == b"strip":
 
                 if self.outlet is None:
                     self.outlet = 0
 
-                self.logger.debug('strip outlet %s', self.outlet)
-                switch_status = response['switches'][int(self.outlet)]['switch']
+                self.logger.debug("strip outlet %s", self.outlet)
+                switch_status = \
+                    response["switches"][int(self.outlet)]["switch"]
 
-            elif self.client.type == b'plug' or self.client.type == b'diy_plug' or self.client.type == b'enhanced_plug' or self.client.type == b'th_plug':
+            elif (
+                self.client.type == b"plug"
+                or self.client.type == b"diy_plug"
+                or self.client.type == b"enhanced_plug"
+                or self.client.type == b"th_plug"
+            ):
 
-                switch_status = response['switch']
+                switch_status = response["switch"]
 
             else:
                 self.logger.error(
-                    'Unknown message received from device: ' % message)
-                raise Exception('Unknown message received from device')
-        
+                    "Unknown message received from device: " % message)
+                raise Exception("Unknown message received from device")
 
             self.logger.debug(
-                'Message: Received status from device, storing in instance')
+                "Message: Received status from device, storing in instance"
+            )
             self.basic_info = response
-            self.basic_info['deviceid'] = self.host
+            self.basic_info["deviceid"] = self.host
 
             self.client.connected_event.set()
 
@@ -295,29 +331,34 @@ class SonoffDevice(object):
 
             # is there is a new message queued to be sent
             if self.params_updated_event.is_set():
-                
-                # only send client update message if the change has been successful
-                if self.params['switch'] == switch_status:
+
+                # only send client update message if the change successful
+                if self.params["switch"] == switch_status:
 
                     self.message_acknowledged_event.set()
                     send_update = True
-                    self.logger.debug('expected update received from switch: %s',
-                        switch_status)
+                    self.logger.debug(
+                        "expected update received from switch: %s",
+                        switch_status
+                    )
 
-                else:                   
+                else:
                     self.logger.info(
-                        'failed update! state is: %s, expecting: %s',
-                        switch_status, self.params['switch'])
+                        "failed update! state is: %s, expecting: %s",
+                        switch_status,
+                        self.params["switch"],
+                    )
 
-            else:                                          
+            else:
                 # this is a status update message originating from the device
                 # only send client update message if the status has changed
 
                 self.logger.info(
-                    'unsolicited update received from switch: %s',
-                    switch_status)
+                    "unsolicited update received from switch: %s",
+                    switch_status
+                )
 
-                if self.params['switch'] != switch_status:       
+                if self.params["switch"] != switch_status:
                     self.params = {"switch": switch_status}
                     send_update = True
 
@@ -325,29 +366,30 @@ class SonoffDevice(object):
                 await self.callback_after_update(self)
 
         except Exception as ex:
-            self.logger.error('Unexpected error in handle_message() for device %s: %s %s', self.device_id, format(ex), traceback.format_exc)
-   
+            self.logger.error(
+                "Unexpected error in handle_message() for device %s: %s %s",
+                self.device_id,
+                format(ex),
+                traceback.format_exc,
+            )
 
     def shutdown_event_loop(self):
-        self.logger.debug('shutdown_event_loop called')
+        self.logger.debug("shutdown_event_loop called")
 
         try:
             # Hide Cancelled Error exceptions during shutdown
             def shutdown_exception_handler(loop, context):
-                if "exception" not in context \
-                    or not isinstance(context["exception"],
-                                      asyncio.CancelledError):
+                if "exception" not in context or not isinstance(
+                    context["exception"], asyncio.CancelledError
+                ):
                     loop.default_exception_handler(context)
 
             self.loop.set_exception_handler(shutdown_exception_handler)
 
             # Handle shutdown gracefully by waiting for all tasks
             # to be cancelled
-            tasks = asyncio.gather(
-                *self.tasks,
-                loop=self.loop,
-                return_exceptions=True
-            )
+            tasks = asyncio.gather(*self.tasks, loop=self.loop,
+                                   return_exceptions=True)
 
             if self.new_loop:
                 tasks.add_done_callback(lambda t: self.loop.stop())
@@ -366,8 +408,8 @@ class SonoffDevice(object):
 
         except Exception as ex:
             self.logger.error(
-                'Unexpected error in shutdown_event_loop(): %s',
-                format(ex))
+                "Unexpected error in shutdown_event_loop(): %s", format(ex)
+            )
 
         finally:
             if self.new_loop:
@@ -378,10 +420,8 @@ class SonoffDevice(object):
                 ):
                     # Python 3.5
                     self.loop.run_until_complete(
-                        self.loop.shutdown_asyncgens()
-                    )
+                        self.loop.shutdown_asyncgens())
                     self.loop.close()
-
 
     @property
     def device_id(self) -> str:
@@ -391,7 +431,7 @@ class SonoffDevice(object):
         :return: Device ID.
         :rtype: str
         """
-        return self.client.properties[b'id'].decode("utf-8")
+        return self.client.properties[b"id"].decode("utf-8")
 
     async def turn_off(self) -> None:
         """
@@ -427,9 +467,7 @@ class SonoffDevice(object):
         raise NotImplementedError("Device subclass needs to implement this.")
 
     def __repr__(self):
-        return "<%s at %s>" % (
-            self.__class__.__name__,
-            self.device_id)
+        return "<%s at %s>" % (self.__class__.__name__, self.device_id)
 
     @property
     def available(self) -> bool:

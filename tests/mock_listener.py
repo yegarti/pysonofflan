@@ -1,30 +1,29 @@
 from datetime import datetime
 from zeroconf import ServiceBrowser, Zeroconf, ServiceInfo
 
-class MyListener:
 
+class MyListener:
     def remove_service(self, zeroconf, type, name):
 
-        if "Mock" in name: 
-            print("%s - Service %s removed" % (datetime.now(), name) )
-
+        if "Mock" in name:
+            print("%s - Service %s removed" % (datetime.now(), name))
 
     def add_service(self, zeroconf, type, name):
 
-        if "Mock" in name: 
-            print("%s - Service %s added" % (datetime.now(), name) )
-            print (zeroconf.get_service_info(type, name))
+        if "Mock" in name:
+            print("%s - Service %s added" % (datetime.now(), name))
+            print(zeroconf.get_service_info(type, name))
 
         ServiceBrowser(zeroconf, name, listener)
 
-
     def update_service(self, zeroconf, type, name):
 
-        if "Mock" in name: 
-            print("%s - Service %s updated" % (datetime.now(), name) )
-            print (zeroconf.get_service_info(type, name))
+        if "Mock" in name:
+            print("%s - Service %s updated" % (datetime.now(), name))
+            print(zeroconf.get_service_info(type, name))
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
 
     zeroconf = Zeroconf()
     listener = MyListener()

@@ -7,6 +7,7 @@ from click.testing import CliRunner
 from pysonofflan import cli
 from tests.sonoff_mock import start_device, stop_device
 
+
 class TestCLI(unittest.TestCase):
     """Tests for pysonofflan CLI interface."""
 
@@ -20,46 +21,44 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli)
-        assert 'No host name or device_id given, see usage below' in result.output
-        assert 'Commands:' in result.output
+        assert "No host name or device_id given, see usage below" in result.output
+        assert "Commands:" in result.output
 
     def test_cli_invalid_arg(self):
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['hello'])
+        result = runner.invoke(cli.cli, ["hello"])
         assert 'Error: No such command "hello"' in result.output
 
     def test_cli_help(self):
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--help']) 
+        result = runner.invoke(cli.cli, ["--help"])
         assert result.exit_code == 0
-        assert 'Show this message and exit.' in result.output
+        assert "Show this message and exit." in result.output
 
     def test_cli_version(self):
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--version'])
+        result = runner.invoke(cli.cli, ["--version"])
         assert result.exit_code == 0
-        assert ', version' in result.output
+        assert ", version" in result.output
 
     def test_cli_no_device_id(self):
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--device_id'])
-        assert 'Error: --device_id option requires an argument' in \
-               result.output
-               
+        result = runner.invoke(cli.cli, ["--device_id"])
+        assert "Error: --device_id option requires an argument" in result.output
+
     def test_cli_no_host_id(self):
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--host'])
-        assert 'Error: --host option requires an argument' in \
-               result.output
+        result = runner.invoke(cli.cli, ["--host"])
+        assert "Error: --host option requires an argument" in result.output
 
     def test_cli_state(self):
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['state'])
-        assert 'No host name or device_id given, see usage below' in result.output
+        result = runner.invoke(cli.cli, ["state"])
+        assert "No host name or device_id given, see usage below" in result.output
 
     def test_cli_on(self):
 
@@ -67,11 +66,11 @@ class TestCLI(unittest.TestCase):
 
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--device_id', 'PlugOnMock', 'on'])
+        result = runner.invoke(cli.cli, ["--device_id", "PlugOnMock", "on"])
 
         print(result.output)
-        
-        assert 'info: State: ON' in result.output
+
+        assert "info: State: ON" in result.output
 
         stop_device()
 
@@ -81,13 +80,13 @@ class TestCLI(unittest.TestCase):
 
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--device_id', 'PlugOffMock', 'off'])
+        result = runner.invoke(cli.cli, ["--device_id", "PlugOffMock", "off"])
 
         print(result.output)
 
-        assert 'info: State: OFF' in result.output
+        assert "info: State: OFF" in result.output
 
-        stop_device()        
+        stop_device()
 
     def test_cli_on_strip(self):
 
@@ -95,11 +94,11 @@ class TestCLI(unittest.TestCase):
 
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--device_id', 'StripOnMock', 'on'])
+        result = runner.invoke(cli.cli, ["--device_id", "StripOnMock", "on"])
 
         print(result.output)
 
-        assert 'info: State: ON' in result.output
+        assert "info: State: ON" in result.output
 
         stop_device()
 
@@ -109,11 +108,11 @@ class TestCLI(unittest.TestCase):
 
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--device_id', 'StripOffMock', 'on'])
+        result = runner.invoke(cli.cli, ["--device_id", "StripOffMock", "on"])
 
         print(result.output)
 
-        assert 'info: State: OFF' in result.output
+        assert "info: State: OFF" in result.output
 
         stop_device()
 
@@ -123,11 +122,13 @@ class TestCLI(unittest.TestCase):
 
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--device_id', 'PlugEncryptMock', '--api_key', 'testkey', 'on'])
+        result = runner.invoke(
+            cli.cli, ["--device_id", "PlugEncryptMock", "--api_key", "testkey", "on"]
+        )
 
         print(result.output)
 
-        assert 'info: State: ON' in result.output
+        assert "info: State: ON" in result.output
 
     def test_cli_on_strip_encrypt(self):
 
@@ -135,36 +136,40 @@ class TestCLI(unittest.TestCase):
 
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['--device_id', 'StripEncryptMock', '--api_key', 'testkey', 'on'])
+        result = runner.invoke(
+            cli.cli, ["--device_id", "StripEncryptMock", "--api_key", "testkey", "on"]
+        )
 
         print(result.output)
 
-        assert 'info: State: ON' in result.output
+        assert "info: State: ON" in result.output
 
         stop_device()
 
-    def test_cli_discover(self):   
+    def test_cli_discover(self):
 
         start_device("DiscoverDevice", "plug")
 
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['discover'])
-        
+        result = runner.invoke(cli.cli, ["discover"])
+
         print(result.output)
 
-        assert "Attempting to discover Sonoff LAN Mode devices on the local " \
-               "network" in result.output
-        assert "DiscoverDevice" in result.output     
+        assert (
+            "Attempting to discover Sonoff LAN Mode devices on the local "
+            "network" in result.output
+        )
+        assert "DiscoverDevice" in result.output
 
         stop_device()
 
     def test_cli_discover_debug(self):
         """Test the CLI."""
         runner = CliRunner()
-        result = runner.invoke(cli.cli, ['-l', 'DEBUG', 'discover'])
-        assert "Looking for all eWeLink devices on local network" in \
-               result.output
+        result = runner.invoke(cli.cli, ["-l", "DEBUG", "discover"])
+        assert "Looking for all eWeLink devices on local network" in result.output
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

@@ -14,6 +14,6 @@ tox-travis==0.12
 flask==1.1.1
 requests==2.21.0
 setuptools==40.8.0
-black==18.9b0
+black==19.10b0
 bumpversion==0.5.3
 

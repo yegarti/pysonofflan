@@ -1,12 +1,6 @@
-import time
-import requests
-import json
-
-from zeroconf import ServiceBrowser, Zeroconf
-
 from Crypto.Hash import MD5
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
+from Crypto.Util.Padding import unpad
 from base64 import b64decode
 
 

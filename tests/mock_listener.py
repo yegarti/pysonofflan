@@ -1,5 +1,5 @@
 from datetime import datetime
-from zeroconf import ServiceBrowser, Zeroconf, ServiceInfo
+from zeroconf import ServiceBrowser, Zeroconf
 
 
 class MyListener:

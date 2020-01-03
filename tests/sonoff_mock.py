@@ -2,11 +2,11 @@ import sys
 import socket
 import threading
 from flask import Flask, json, request
-from zeroconf import ServiceBrowser, Zeroconf, ServiceInfo
+from zeroconf import Zeroconf, ServiceInfo
 from pysonofflan import sonoffcrypto
 
 
-next_port = 8082  # default port for class invocation is 8082 to stop conflicting with command line by default
+next_port = 8082  # to stop conflicting with command line by default
 
 
 class SonoffLANModeDeviceMock:
@@ -61,7 +61,10 @@ class SonoffLANModeDeviceMock:
             else:
                 print("wrong device")
 
-            return json.dumps({"seq": 1, "sequence": "1577725767", "error": 0}), 200
+            return (
+                json.dumps({"seq": 1, "sequence": "1577725767", "error": 0}),
+                200,
+            )
 
         def start():
             api.run(host=self._ip, port=self._port)
@@ -100,21 +103,35 @@ class SonoffLANModeDeviceMock:
 
         if self._sonoff_type == "strip":
 
-            data = '{"sledOnline":"on","configure":[{"startup":"off","outlet":0},{"startup":"off","outlet":1},{"startup":"off","outlet":2},{"startup":"off","outlet":3}],'
-            data += '"pulses":[{"pulse":"off","width":1000,"outlet":0},{"pulse":"off","width":1000,"outlet":1},{"pulse":"off","width":1000,"outlet":2},{"pulse":"off","width":1000,"outlet":3}],'
+            data = '{"sledOnline":"on",' \
+                '"configure":[' \
+                '{"startup":"off","outlet":0},{"startup":"off","outlet":1},' \
+                '{"startup":"off","outlet":2},{"startup":"off","outlet":3}],' \
+                '"pulses":[' \
+                '{"pulse":"off","width":1000,"outlet":0},' \
+                '{"pulse":"off","width":1000,"outlet":1},' \
+                '{"pulse":"off","width":1000,"outlet":2},' \
+                '{"pulse":"off","width":1000,"outlet":3}],'
 
             if self._status == "on":
-                data += '"switches":[{"switch":"on","outlet":0},{"switch":"off","outlet":1},{"switch":"off","outlet":2},{"switch":"on","outlet":3}]}'
+                data += '"switches":[{"switch":"on","outlet":0},' \
+                    '{"switch":"off","outlet":1},{"switch":"off",' \
+                    '"outlet":2},{"switch":"on","outlet":3}]}'
 
             else:
-                data += '"switches":[{"switch":"off","outlet":0},{"switch":"off","outlet":1},{"switch":"off","outlet":2},{"switch":"on","outlet":3}]}'
+                data += '"switches":[{"switch":"off","outlet":0},' \
+                    '{"switch":"off","outlet":1},' \
+                    '{"switch":"off","outlet":2},' \
+                    '{"switch":"on","outlet":3}]}'
 
         else:
 
             if self._status == "on":
-                data = '{"switch":"on","startup":"stay","pulse":"off","sledOnline":"off","pulseWidth":500,"rssi":-55}'
+                data = '{"switch":"on","startup":"stay","pulse":"off",' \
+                    '"sledOnline":"off","pulseWidth":500,"rssi":-55}'
             else:
-                data = '{"switch":"off","startup":"stay","pulse":"off","sledOnline":"off","pulseWidth":500,"rssi":-55}'
+                data = '{"switch":"off","startup":"stay","pulse":"off",' \
+                    '"sledOnline":"off","pulseWidth":500,"rssi":-55}'
 
         if self._encrypt:
             data = sonoffcrypto.format_encryption_txt(
@@ -156,7 +173,7 @@ class SonoffLANModeDeviceMock:
 
     def process_request(self, json_):
 
-        if json_["encrypt"] == True:
+        if json_["encrypt"] is True:
             iv = json_["iv"]
             data = sonoffcrypto.decrypt(json_["data"], iv, self._api_key)
             import json
@@ -177,7 +194,9 @@ class SonoffLANModeDeviceMock:
         self._zeroconf_registrar.update_service(self.get_service_info())
 
 
-def start_device(name=None, sonoff_type=None, api_key=None, ip=None, port=None):
+def start_device(
+    name=None, sonoff_type=None, api_key=None, ip=None, port=None
+):
 
     device = SonoffLANModeDeviceMock(name, sonoff_type, api_key, ip, port)
     device.run_server()
@@ -201,7 +220,7 @@ if __name__ == "__main__":
         api_key = sys.argv[3]
         ip = sys.argv[4]
         port = int(sys.argv[5])
-    except:
+    except: # noqa
         pass
 
     start_device(name, sonoff_type, api_key, ip, port)

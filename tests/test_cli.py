@@ -21,7 +21,9 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli)
-        assert "No host name or device_id given, see usage below" in result.output
+        assert (
+            "No host name or device_id given, see usage below" in result.output
+        )
         assert "Commands:" in result.output
 
     def test_cli_invalid_arg(self):
@@ -46,7 +48,9 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli, ["--device_id"])
-        assert "Error: --device_id option requires an argument" in result.output
+        assert (
+            "Error: --device_id option requires an argument" in result.output
+        )
 
     def test_cli_no_host_id(self):
         """Test the CLI."""
@@ -58,7 +62,9 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli, ["state"])
-        assert "No host name or device_id given, see usage below" in result.output
+        assert (
+            "No host name or device_id given, see usage below" in result.output
+        )
 
     def test_cli_on(self):
 
@@ -123,7 +129,8 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(
-            cli.cli, ["--device_id", "PlugEncryptMock", "--api_key", "testkey", "on"]
+            cli.cli,
+            ["--device_id", "PlugEncryptMock", "--api_key", "testkey", "on"],
         )
 
         print(result.output)
@@ -137,7 +144,8 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(
-            cli.cli, ["--device_id", "StripEncryptMock", "--api_key", "testkey", "on"]
+            cli.cli,
+            ["--device_id", "StripEncryptMock", "--api_key", "testkey", "on"],
         )
 
         print(result.output)
@@ -168,7 +176,9 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli, ["-l", "DEBUG", "discover"])
-        assert "Looking for all eWeLink devices on local network" in result.output
+        assert (
+            "Looking for all eWeLink devices on local network" in result.output
+        )
 
 
 if __name__ == "__main__":

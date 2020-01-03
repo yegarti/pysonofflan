@@ -12,6 +12,8 @@ pycryptodome==3.8.1
 zeroconf==0.24.0
 tox-travis==0.12
 flask==1.1.1
-urllib3==1.24.1
 requests==2.21.0
 setuptools==40.8.0
+black==18.9b0
+bumpversion==0.5.3
+

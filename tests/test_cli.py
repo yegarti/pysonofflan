@@ -4,7 +4,7 @@
 """Tests for `pysonofflan` package."""
 import unittest
 from click.testing import CliRunner
-from pysonofflan import cli
+from pysonofflanr3 import cli
 from tests.sonoff_mock import start_device, stop_device
 
 

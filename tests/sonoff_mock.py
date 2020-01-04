@@ -3,7 +3,7 @@ import socket
 import threading
 from flask import Flask, json, request
 from zeroconf import Zeroconf, ServiceInfo
-from pysonofflan import sonoffcrypto
+from pysonofflanr3 import sonoffcrypto
 
 
 next_port = 8082  # to stop conflicting with command line by default

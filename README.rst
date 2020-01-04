@@ -35,7 +35,7 @@ pySonoffLANR3
     :target: https://pyup.io/repos/github/mattsaxon/pysonofflan/
     :alt: Python 3
 
-.. image:: https://img.shields.io/badge/say-thanks-ff69b4.svg
+.. image:: https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg
     :target: https://www.buymeacoffee.com/XTOsBAc
     :alt: Say Thanks
 

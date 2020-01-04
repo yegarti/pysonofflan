@@ -306,7 +306,6 @@ class SonoffLANModeClient:
             self.url + "/zeroconf/signal_strength",
         )
 
-
     def send(self, request: Union[str, Dict], url):
         """
         Send message to an already-connected Sonoff LAN Mode Device

@@ -3,10 +3,9 @@ python:
 - 3.8
 - 3.7
 - 3.6
-- flake8
 sudo: required
 dist: xenial
-install: pip install -U tox-travis coveralls flake8
+install: pip install -U tox-travis coveralls
 script: tox
 after_success:
   - coveralls

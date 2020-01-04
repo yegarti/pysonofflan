@@ -306,12 +306,6 @@ class SonoffLANModeClient:
             self.url + "/zeroconf/signal_strength",
         )
 
-    def send_info(self, request: Union[str, Dict]):
-
-        return self.send(
-            self.get_update_payload(
-                self.device_id, {}), self.url + "/zeroconf/info"
-        )
 
     def send(self, request: Union[str, Dict], url):
         """

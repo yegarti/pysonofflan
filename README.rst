@@ -1,6 +1,6 @@
-==============
-pysonofflan_r3
-==============
+=============
+pysonofflanr3
+=============
 
 
 .. image:: https://img.shields.io/pypi/v/pysonofflanr3.svg
@@ -74,13 +74,13 @@ Features
 Documentation
 ------------------
 
-* Documentation: https://pysonofflan.readthedocs.io.
+* Documentation: https://pysonofflanr3.readthedocs.io.
 
 Install
 ------------------
 ::
 
-    $ pip install pysonofflan
+    $ pip install pysonofflanr3
 
 Command-Line Usage
 ------------------

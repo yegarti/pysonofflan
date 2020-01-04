@@ -2,8 +2,8 @@
 Credits
 =======
 
-Development Leads
------------------
+Development Lead
+----------------
 
 * Matt Saxon <saxonmatt@hotmail.com>
 
@@ -19,5 +19,5 @@ Acknolwledgements
 
 * Andrew Beveridge <andrew@beveridge.uk>
 
-This R3 version was prompted by the excellent work reverse engineering the original firmware by Andrew
+This R3 fork was prompted by the excellent work reverse engineering the original firmware by Andrew
 Additionally, whilst the workings of the R3 firmware is completely different, this project is structured on Andrew's work

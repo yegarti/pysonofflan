@@ -27,11 +27,11 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
     ],
-    description="Interface for Sonoff devices running R3+ Itead "
+    description="Interface for Sonoff devices running v3+ Itead "
                 "firmware.",
     entry_points={
         'console_scripts': [
-            'pysonofflan=pysonofflan.cli:cli',
+            'pysonofflanr3=pysonofflanr3.cli:cli',
         ],
     },
     install_requires=requirements,

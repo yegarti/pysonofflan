@@ -86,7 +86,7 @@ Command-Line Usage
 ------------------
 ::
 
-    Usage: pysonofflan [OPTIONS] COMMAND [ARGS]...
+    Usage: pysonofflanr3 [OPTIONS] COMMAND [ARGS]...
 
       A cli tool for controlling Sonoff Smart Switches/Plugs in LAN Mode.
 
@@ -95,7 +95,7 @@ Command-Line Usage
       --device_id TEXT     Device ID of the device to connect to.
       --inching TEXT       Number of seconds of "on" time if this is an
                            Inching/Momentary switch.
-      -v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO or DEBUG
+      -l, --level LVL  Either CRITICAL, ERROR, WARNING, INFO or DEBUG
       --help               Show this message and exit.
       --api_key KEY        Needed for devices not in DIY mode. See https://github.com/mattsaxon/pysonofflan/wiki/Finding-the-API__Key
       

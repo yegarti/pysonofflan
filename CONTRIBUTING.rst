@@ -15,7 +15,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/beveradb/pysonofflan/issues.
+Report bugs at https://github.com/mattsaxon/pysonofflan/issues.
 
 If you are reporting a bug, please include:
 
@@ -38,14 +38,14 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-pySonoffLAN could always use more documentation, whether as part of the
+pySonoffLANR3 could always use more documentation, whether as part of the
 official pySonoffLAN docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/beveradb/pysonofflan/issues.
+The best way to send feedback is to file an issue at https://github.com/mattsaxon/pysonofflan/issues.
 
 If you are proposing a feature:
 
@@ -57,7 +57,7 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `pysonofflan` for local development.
+Ready to contribute? Here's how to set up `pysonofflanr3` for local development.
 
 1. Fork the `pysonofflan` repo on GitHub.
 2. Clone your fork locally::
@@ -102,8 +102,8 @@ Before you submit a pull request, check that it meets these guidelines:
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.7, 3.4, 3.5 and 3.6, and for PyPy. Check
-   https://travis-ci.org/beveradb/pysonofflan/pull_requests
+3. The pull request should work for Python 3.6, 3.7 and 3.8. Check
+   https://travis-ci.org/mattsaxon/pysonofflan/pull_requests
    and make sure that the tests pass for all supported Python versions.
 
 Tips

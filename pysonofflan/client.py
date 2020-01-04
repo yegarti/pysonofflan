@@ -228,8 +228,8 @@ class SonoffLANModeClient:
 
         except Exception as ex:
             self.logger.error(
-                "Error updating service for device %s: %s,' \
-                ' probably wrong API key",
+                "Error updating service for device %s: %s,"
+                " probably wrong API key",
                 self.device_id,
                 format(ex),
             )

@@ -145,7 +145,8 @@ class TestCLI(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(
             cli.cli,
-            ["--device_id", "StripEncryptMock", "--api_key", "testkey", "on"],
+            ["--device_id", "StripEncryptMock", "--api_key", "testkey",
+             "-l", "DEBUG", "on"],
         )
 
         print(result.output)

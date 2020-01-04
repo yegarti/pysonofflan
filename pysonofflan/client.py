@@ -187,52 +187,58 @@ class SonoffLANModeClient:
 
     def update_service(self, zeroconf, type, name):
 
-        try:
-            info = zeroconf.get_service_info(type, name)
-            self.logger.debug("properties: %s", info.properties)
+        # This is only needed for zderoconfg 0.24.1 to 0.24.4... this needs investigating
+        if self.my_service_name == name:
 
-            self.type = info.properties.get(b"type")
-            self.logger.debug("type: %s", self.type)
+            try:
+                info = zeroconf.get_service_info(type, name)
+                self.logger.debug("properties: %s", info.properties)
 
-            data1 = info.properties.get(b"data1")
-            data2 = info.properties.get(b"data2")
+                self.type = info.properties.get(b"type")
+                self.logger.debug("type: %s", self.type)
 
-            if data2 is not None:
-                data1 += data2
-                data3 = info.properties.get(b"data3")
+                data1 = info.properties.get(b"data1")
+                data2 = info.properties.get(b"data2")
 
-                if data3 is not None:
-                    data1 += data3
-                    data4 = info.properties.get(b"data4")
+                if data2 is not None:
+                    data1 += data2
+                    data3 = info.properties.get(b"data3")
 
-                    if data4 is not None:
-                        data1 += data4
+                    if data3 is not None:
+                        data1 += data3
+                        data4 = info.properties.get(b"data4")
 
-            if info.properties.get(b"encrypt"):
-                self.encrypted = True
-                # decrypt the message
-                iv = info.properties.get(b"iv")
-                data = sonoffcrypto.decrypt(data1, iv, self.api_key)
-                self.logger.debug("decrypted data: %s", data)
+                        if data4 is not None:
+                            data1 += data4
 
-            else:
-                self.encrypted = False
-                data = data1
+                if info.properties.get(b"encrypt"):
+                    self.encrypted = True
+                    # decrypt the message
+                    iv = info.properties.get(b"iv")
+                    data = sonoffcrypto.decrypt(data1, iv, self.api_key)
+                    self.logger.debug("decrypted data: %s", data)
 
-            self.properties = info.properties
+                else:
+                    self.encrypted = False
+                    data = data1
 
-            # process the events on an event loop
-            # this method is on a background thread called from zeroconf
-            asyncio.run_coroutine_threadsafe(
-                self.event_handler(data), self.loop)
+                self.properties = info.properties
 
-        except Exception as ex:
-            self.logger.error(
-                "Error updating service for device %s: %s,"
-                " probably wrong API key",
-                self.device_id,
-                format(ex),
-            )
+                # process the events on an event loop
+                # this method is on a background thread called from zeroconf
+                asyncio.run_coroutine_threadsafe(
+                    self.event_handler(data), self.loop)
+
+            except Exception as ex:
+                self.logger.error(
+                    "Error updating service for device %s: %s,"
+                    " probably wrong API key: %s",
+                    self.device_id,
+                    format(ex), name
+                )
+
+        else:
+            self.logger.debug("Service %s updated (not our switch)" % name)
 
     def retry_connection(self):
 

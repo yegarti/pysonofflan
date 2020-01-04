@@ -187,7 +187,7 @@ class SonoffLANModeClient:
 
     def update_service(self, zeroconf, type, name):
 
-        # This is only needed for zderoconfg 0.24.1 to 0.24.4... this needs investigating
+        # This is only needed for zderoconfg 0.24.1 to 0.24.4
         if self.my_service_name == name:
 
             try:

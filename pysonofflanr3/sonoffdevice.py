@@ -293,15 +293,11 @@ class SonoffDevice(object):
 
             response = json.loads(message)
 
-            self.logger.debug("loaded json")
-            self.logger.debug("outlet %s", self.outlet)
-
             if self.client.type == b"strip":
 
                 if self.outlet is None:
                     self.outlet = 0
 
-                self.logger.debug("strip outlet %s", self.outlet)
                 switch_status = \
                     response["switches"][int(self.outlet)]["switch"]
 

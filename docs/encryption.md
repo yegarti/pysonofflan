@@ -3,11 +3,11 @@ Encryption
 
 ## When is it used?
 
-All know Sonoff devices running Firmware 3+ have encryption implemented unless they are running in DIY mode.
+All known Sonoff devices running Firmware 3+ have encryption implemented unless they are running in DIY mode.
 
 DIY mode is a feature enabled on some devices, typically those branded DIY or R3. It is enabled using a jumper on the mainboard.
 
-For devices with encryption enabled, the api_key is needed to read the device status or to operate the device using the API. The device however can be discovered without the key. 
+For devices with encryption enabled, the api_key is needed to read the device status or to operate the device using the API. The device, however, can be discovered without the key. 
 
 ## Obtaining the api_key
 
@@ -15,7 +15,7 @@ For devices with encryption enabled, the api_key is needed to read the device st
 
 The api_key is not designed to be captured by users and is not available in any user interfaces.
 
-To capture the api key there are a number of options;
+To capture the api_key there are a number of options;
 
 * Capture with V2 firmware: If you have V2 firmware and are using the earlier version of this component/package, the api_key is visible in the debug logs at startup (part of the "user online response" message)
 

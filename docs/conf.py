@@ -26,6 +26,10 @@ import pysonofflanr3
 
 extensions = ['recommonmark']
 
+from recommonmark.parser import CommonMarkParser
+
+source_parsers = {'.md': CommonMarkParser}
+
 # -- General configuration ---------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

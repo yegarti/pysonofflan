@@ -1,5 +1,4 @@
-Encryption
-==========
+# Encryption
 
 ## When is it used?
 

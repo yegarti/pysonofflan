@@ -16,7 +16,7 @@ pysonofflanr3
     :alt: Build Status
 
 .. image:: https://readthedocs.org/projects/pysonofflanr3/badge/?version=latest
-    :target: https://pysonofflanr3.readthedocs.io/en/latest/?badge=latest
+    :target: https://pysonofflanr3.readthedocs.io/
     :alt: Documentation Status
 
 .. image:: https://coveralls.io/repos/github/mattsaxon/pysonofflan/badge.svg

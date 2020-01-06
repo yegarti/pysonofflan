@@ -10,6 +10,7 @@ Welcome to pySonoffLANR3's documentation!
    contributing
    authors
    history
+   encryption
 
 Indices and tables
 ==================

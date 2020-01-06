@@ -21,3 +21,5 @@ To capture the api_key there are a number of options;
 * Capture during pairing using a browser: You can use the method described [here](https://blog.ipsumdomus.com/sonoff-switch-complete-hack-without-firmware-upgrade-1b2d6632c01). Despite this guide being quite old and for older firmware, the early part where the api_key is uncovered still works for some devices. Unfortunately this is only visible this way during pairing
 
 * Capture during pairing using a network trace tool. 'tcpdump' is a popular tool and can be run on an OpenWRT router. This is the route which needs the most technical expertise, but seems to be the only viable way in certain circumstances.
+
+* There is another article [here](https://community.hubitat.com/t/sonoff-ewelink-via-homebridge-node/3753) explaining another method

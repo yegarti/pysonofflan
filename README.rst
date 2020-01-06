@@ -64,8 +64,7 @@ on the local network using a WebSocket connection on port 8081.
 Features
 --------
 
-* Discover all devices on local network (192.168.0.0/24, 192.168.1.0/24)
-* Discover IP address for device with known Device ID (from eWeLink app)
+* Discover all devices on local network
 * Read device state
 * Switch device ON/OFF
 * Listen for state changes announced by the device (e.g. by physical switch)
@@ -100,8 +99,8 @@ Command-Line Usage
       --api_key KEY        Needed for devices not in DIY mode. See https://github.com/mattsaxon/pysonofflan/wiki/Finding-the-API__Key
       
     Commands:
-      discover  Discover devices in the network (takes ~1...
-      listen    Connect to device, print state, then print...
+      discover  Discover devices in the network
+      listen    Connect to device, print state and repeat
       off       Turn the device off.
       on        Turn the device on.
       state     Connect to device and print current state.

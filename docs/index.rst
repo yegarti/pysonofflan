@@ -1,4 +1,4 @@
-Welcome to pySonoffLANR3's documentation!
+Welcome to pySonoffLAN's documentation!
 ======================================
 
 .. toctree::
@@ -10,7 +10,6 @@ Welcome to pySonoffLANR3's documentation!
    contributing
    authors
    history
-   encryption
 
 Indices and tables
 ==================

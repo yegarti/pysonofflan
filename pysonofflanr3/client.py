@@ -279,7 +279,7 @@ class SonoffLANModeClient:
             response = self.send(request, self.url + "/zeroconf/switch")
 
         try:
-            response_json = json.loads(response.content)
+            response_json = json.loads(response.content.decode('utf-8'))
 
             error = response_json["error"]
 

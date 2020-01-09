@@ -291,7 +291,6 @@ class SonoffDevice(object):
 
             self.message_ping_event.set()
 
-            print(message)
             response = json.loads(message.decode('utf-8'))
 
             if self.client.type == b"strip":

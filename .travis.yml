@@ -1,6 +1,5 @@
 language: python
 python:
-- 3.8
 - 3.7
 - 3.6
 - 3.5
@@ -13,13 +12,10 @@ after_success:
 deploy:
   provider: pypi
   distributions: sdist bdist_wheel
-  user: "__token__"
-  server: https://test.pypi.org/legacy/ # Remove for deployment to official PyPi repo
+  user: beveradb
   password:
-    secure: NYNI4VfvwiF46/06n6NjEygtrddOTRxle5mSCxwSh38ITQU3x0piowSULDH6dSDGl7jGQNCrhjgdclzxiVpGEENdkRDxU6ZKxYx57PzsSp+ExueJ52V/byH8YIFYxPyQn++xXmYcg1PF/zDq+ln+trPQKw5/042OraXeAU8OflfM/VqvCAWT9xyqJLjPqP1ndb3RlsVlSaLEGQyGqmr0cojAQE2tZUX8+KC+prP4vEpDxcuAT6EH1fE6bKDp1Xfd8x1XTXbW1A1hUeHqjp53kNRH0TbVQ/iMF5MipwVL8jxW0u7qo2D5bd017p1jMUE38eFmd7MYXYgmvWW6rOc1FGTfW/dZWq5vWMwREzudpvDNm/RhGW0RnVEJJJolbFr2jGJAJ1h6WtJiyt0eWNkbRnfHRW2DjGOR05cJCATGgE40rXwXoNjkQFximVZZaBMwC+arSaEiHi6UWfWAi6D26sWNMtM0TI+I7LiUVrcs36BlL32I+3lfZZU7CM2xTpRlADs9jGf1yRd0ujKqTyVrYGSV4ZqCVVkwgTsBlohk/F8uNISUUTwkECbtwE+zXG10yiZbMES8sxe5sTIzGLkQ2uHjzynq4/GtaxOwZdA+4Qf4ab1UT5b0f28VI9a5Th30Z/MIHhrsVGNvHHLu8YF2Y9Qx8d1WvJJ4NTyIH+6zE1g= # TestPyPi
-    # secure: Wo6nWS00bZMDXVMlQtu27U0nqMv7c16YvPlp6/DFe1rAwTubbt8MqaVaT708ByVw9nw7NvlcYSOoG+FNG6DQijfDkhfE1+9zwRqdz+cSZW75l/qcvwgq+8L8a15j5utomOz6d7BWJFQrqwVZ8m891OFZ+xLNwnsW9pTfRrjWlPmoAXISC+W8Yfemk4gRrO6X52Db8scapvobf1rO0CgFurNG924dr+wNCVfXhYbxLiCGT3qgT2m3sP9ZeCiZZ0ysabIiJgGZ+BQ5A7B8zDGMAEL5u0IDpWcl1qruzRQRm2JftVA4Lv9M8T/uy1tSId5gAXlw/IEUPxJvwilf2hi0uzp8y08q3Fap+bflxxloCmhb5K+SPM92TJPXa9B7VdbNVTJV4Whdybk2NvWxp6wYLwdgKhEVHPVY9knnEbl16ftp4UP5zD9DpkWU6sVrSf4NWzAEDIXGmakbS71zJxirQbzgb0mQXu1UveIhFevlEAr/z6YzZdX49QhNmlWYq+fgD+fEcXA7s2PcydDuaU7bKxH//PykF+wj8x7buZx5m2FzHTGRSTLUulg+iULYKy69X0mhcVAnYbMkSydoIAbUF90JKlyciZmfOoIVQGK66ZGc05YeJhrFVq1I9bdbbQf+5dCW1hSbgDSwWTrIN4fKbB2CnW3qSJZ/baZEZn03Gik= # PyPi
+    secure: B2GjQNy6YqcxJyjqVifLIdcSbrfWQdwxROj//4Ii6EX4bEohwo+Apdec488kJZ8CLYf6Fry1lf8wpN6OYU531Pt5BNPNG8MCAGfr5HTdtsV8ihrjr6vhC1USE9cqmnNWjpIPB7k6UaWELcsYSloeYrfgY/PQECigUtgmZt1BZHHO/3RfdaVxzO58Ye4gLV7uq7DPHOq8aExhgwO2WZyFLI21hiG03BxJ27gUKVIxz3bG+SDrbS3OCdOKCUr4471nCHCcVMAJl0g2FTAR6XqpBeUqveCfKu0dNDM7EtsloCaBZOzD2xJzJY5tTOKEZGLCCaEZlx+jMbZrI4XJyEOBNyYhXTS6lkR3xQHSAIL/Is0b+MulK0Zx1rXKdf/iijXo4dWmn89ca9s4iUu8Ks/ajzZ4LCyJzXZeKfWdB/M/4RAt6cysIWLkttkYSu1YTxF0+c85yBdlZh4b7/DfOJMzWQ6vf/AyeEwQrje+pdABeiAkk16LZZtv02jiqEXOFgmq+msDQWLf2C34z7hoQf97fRlkJ56wr0tmneFYUR30xWrRp/aZW0dqy/wREfj3xGZm6sW9PbgliXyAnWS8R1Yq7mCtA4j8MtiE40lg08WZVeG0GED9zgXXTFTx8qX3xMiwRu4TioSjAk9+5vYVkD04Vtax7uut0U1U6fY3dQSLjTE=
   on:
     tags: true
-    repo: mattsaxon/pysonofflan
-    branch: V3-Firmware
+    repo: beveradb/pysonofflan
     python: 3.7

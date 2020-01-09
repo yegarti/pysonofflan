@@ -12,9 +12,9 @@ To install pySonoffLAN, run this command in your terminal:
 
 .. code-block:: console
 
-    $ pip install pysonofflanr3
+    $ pip install pysonofflan
 
-This is the preferred method to install pySonoffLANR3, as it will always install the most recent stable release.
+This is the preferred method to install pySonoffLAN, as it will always install the most recent stable release.
 
 If you don't have `pip`_ installed, this `Python installation guide`_ can guide
 you through the process.
@@ -26,19 +26,19 @@ you through the process.
 From sources
 ------------
 
-The sources for pySonoffLANR3 can be downloaded from the `Github repo`_.
+The sources for pySonoffLAN can be downloaded from the `Github repo`_.
 
 You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/mattsaxon/pysonofflan
+    $ git clone git://github.com/beveradb/pysonofflan
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/mattsaxon/pysonofflan/tarball/master
+    $ curl  -OL https://github.com/beveradb/pysonofflan/tarball/master
 
 Once you have a copy of the source, you can install it with:
 
@@ -47,5 +47,5 @@ Once you have a copy of the source, you can install it with:
     $ python setup.py install
 
 
-.. _Github repo: https://github.com/mattsaxon/pysonofflan
-.. _tarball: https://github.com/mattsaxon/pysonofflan/tarball/master
+.. _Github repo: https://github.com/beveradb/pysonofflan
+.. _tarball: https://github.com/beveradb/pysonofflan/tarball/master

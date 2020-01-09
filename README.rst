@@ -1,51 +1,39 @@
-=============
-pysonofflanr3
-=============
+===========
+pySonoffLAN
+===========
 
 
-.. image:: https://img.shields.io/pypi/v/pysonofflanr3.svg
-    :target: https://pypi.python.org/pypi/pysonofflanr3
+.. image:: https://img.shields.io/pypi/v/pysonofflan.svg
+    :target: https://pypi.python.org/pypi/pysonofflan
     :alt: Latest PyPi Release
 
-.. image:: https://img.shields.io/pypi/pyversions/pysonofflanr3.svg?style=flat
-    :target: https://pypi.python.org/pypi/pysonofflanr3
+.. image:: https://img.shields.io/pypi/pyversions/pysonofflan.svg?style=flat
+    :target: https://pypi.python.org/pypi/pysonofflan
     :alt: Supported Python Versions
 
-.. image:: https://img.shields.io/travis/mattsaxon/pysonofflan.svg
-    :target: https://travis-ci.org/mattsaxon/pysonofflan
+.. image:: https://img.shields.io/travis/beveradb/pysonofflan.svg
+    :target: https://travis-ci.org/beveradb/pysonofflan
     :alt: Build Status
 
-.. image:: https://readthedocs.org/projects/pysonofflanr3/badge/?version=latest
-    :target: https://pysonofflanr3.readthedocs.io/
+.. image:: https://readthedocs.org/projects/pysonofflan/badge/?version=latest
+    :target: https://pysonofflan.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://coveralls.io/repos/github/mattsaxon/pysonofflan/badge.svg
-    :target: https://coveralls.io/github/mattsaxon/pysonofflan
+.. image:: https://coveralls.io/repos/github/beveradb/pysonofflan/badge.svg?branch=master
+    :target: https://coveralls.io/github/beveradb/pysonofflan?branch=master
     :alt: Code Coverage
 
-.. image:: https://img.shields.io/pypi/wheel/pysonofflanr3.svg
-    :target: https://pypi.org/project/pysonofflanr3/#files
+.. image:: https://img.shields.io/pypi/wheel/pysonofflan.svg
+    :target: https://pypi.org/project/pysonofflan/#files
     :alt: Has Wheel Package
-   
-.. image:: https://pyup.io/repos/github/mattsaxon/pysonofflan/shield.svg
-    :target: https://pyup.io/repos/github/mattsaxon/pysonofflan/
+
+.. image:: https://pyup.io/repos/github/beveradb/pysonofflan/shield.svg
+    :target: https://pyup.io/repos/github/beveradb/pysonofflan/
     :alt: Updates
 
-.. image:: https://pyup.io/repos/github/mattsaxon/pysonofflan/python-3-shield.svg
-    :target: https://pyup.io/repos/github/mattsaxon/pysonofflan/
-    :alt: Python 3
-
-.. image:: https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg
-    :target: https://www.buymeacoffee.com/XTOsBAc
-    :alt: Buy Me A Coffee
 
 Control Sonoff devices running original firmware, in LAN mode.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To control Sonoff switches running the V3+ Itead firmware (tested on 3.0, 3.0.1, 3.1.0, 3.3.0), locally (LAN mode).
-
-**This will only work for Sonoff devices running V3+ of the stock (Itead / eWeLink) firmware. For users of V1.8.0 - V2.6.1, please use**  `PySonoffLAN <https://pypi.org/project/pysonofflan/>`_
-
 
 This module provides a way to interface with Sonoff smart home devices,
 such as smart switches (e.g. Sonoff Basic), plugs (e.g. Sonoff S20),
@@ -61,10 +49,20 @@ Since mid 2018, the firmware Itead have shipped with most Sonoff devices
 has provided this feature, allowing devices to be controlled directly
 on the local network using a WebSocket connection on port 8081.
 
+The feature is designed to only be used when there is no connection
+to the Itead cloud servers, (e.g. if your internet connection is down,
+or their servers are down).
+As such, it is only enabled when the device is connected to your WiFi
+network, but *unable to reach the Itead servers*.
+
+Most users will only be able to use this by **deliberately
+blocking internet access** to their Sonoff devices.
+
 Features
 --------
 
-* Discover all devices on local network
+* Discover all devices on local network (192.168.0.0/24, 192.168.1.0/24)
+* Discover IP address for device with known Device ID (from eWeLink app)
 * Read device state
 * Switch device ON/OFF
 * Listen for state changes announced by the device (e.g. by physical switch)
@@ -73,19 +71,19 @@ Features
 Documentation
 ------------------
 
-* Documentation: https://pysonofflanr3.readthedocs.io.
+* Documentation: https://pysonofflan.readthedocs.io.
 
 Install
 ------------------
 ::
 
-    $ pip install pysonofflanr3
+    $ pip install pysonofflan
 
 Command-Line Usage
 ------------------
 ::
 
-    Usage: pysonofflanr3 [OPTIONS] COMMAND [ARGS]...
+    Usage: pysonofflan [OPTIONS] COMMAND [ARGS]...
 
       A cli tool for controlling Sonoff Smart Switches/Plugs in LAN Mode.
 
@@ -94,13 +92,12 @@ Command-Line Usage
       --device_id TEXT     Device ID of the device to connect to.
       --inching TEXT       Number of seconds of "on" time if this is an
                            Inching/Momentary switch.
-      -l, --level LVL  Either CRITICAL, ERROR, WARNING, INFO or DEBUG
+      -v, --verbosity LVL  Either CRITICAL, ERROR, WARNING, INFO or DEBUG
       --help               Show this message and exit.
-      --api_key KEY        Needed for devices not in DIY mode. See https://github.com/mattsaxon/pysonofflan/wiki/Finding-the-API__Key
-      
+
     Commands:
-      discover  Discover devices in the network
-      listen    Connect to device, print state and repeat
+      discover  Discover devices in the network (takes ~1...
+      listen    Connect to device, print state, then print...
       off       Turn the device off.
       on        Turn the device on.
       state     Connect to device and print current state.

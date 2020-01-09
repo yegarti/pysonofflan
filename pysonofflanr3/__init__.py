@@ -54,7 +54,7 @@ __version__ = "1.1.0"
 __url__ = "https://github.com/mattsaxon/pysonofflan"
 
 # flake8: noqa
-from client import SonoffLANModeClient
-from discover import Discover
-from sonoffdevice import SonoffDevice
-from sonoffswitch import SonoffSwitch
+from .client import SonoffLANModeClient
+from .discover import Discover
+from .sonoffdevice import SonoffDevice
+from .sonoffswitch import SonoffSwitch

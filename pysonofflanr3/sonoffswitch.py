@@ -2,7 +2,8 @@ import asyncio
 import logging
 from typing import Callable, Awaitable, Dict
 
-from pysonofflan import SonoffDevice, SonoffLANModeClient
+from pysonofflanr3 import SonoffDevice
+from pysonofflanr3 import SonoffLANModeClient
 
 
 class SonoffSwitch(SonoffDevice):
@@ -21,22 +22,28 @@ class SonoffSwitch(SonoffDevice):
     Errors reported by the device are raised as Exceptions,
     and should be handled by the user of the library.
     """
-    # switch states
-    SWITCH_STATE_ON = 'ON'
-    SWITCH_STATE_OFF = 'OFF'
-    SWITCH_STATE_UNKNOWN = 'UNKNOWN'
 
-    def __init__(self,
-                 host: str,
-                 callback_after_update: Callable[
-                     [SonoffDevice], Awaitable[None]] = None,
-                 shared_state: Dict = None,
-                 inching_seconds: int = None,
-                 logger=None,
-                 loop=None,
-                 ping_interval=SonoffLANModeClient.DEFAULT_PING_INTERVAL,
-                 timeout=SonoffLANModeClient.DEFAULT_TIMEOUT,
-                 context: str = None) -> None:
+    # switch states
+    SWITCH_STATE_ON = "ON"
+    SWITCH_STATE_OFF = "OFF"
+    SWITCH_STATE_UNKNOWN = "UNKNOWN"
+
+    def __init__(
+        self,
+        host: str,
+        callback_after_update:
+            Callable[[SonoffDevice], Awaitable[None]] = None,
+        shared_state: Dict = None,
+        inching_seconds: int = None,
+        logger=None,
+        loop=None,
+        ping_interval=SonoffLANModeClient.DEFAULT_PING_INTERVAL,
+        timeout=SonoffLANModeClient.DEFAULT_TIMEOUT,
+        context: str = None,
+        device_id: str = None,
+        api_key: str = None,
+        outlet: int = None,
+    ) -> None:
 
         self.inching_seconds = inching_seconds
         self.parent_callback_after_update = callback_after_update
@@ -55,7 +62,10 @@ class SonoffSwitch(SonoffDevice):
             shared_state=shared_state,
             ping_interval=ping_interval,
             timeout=timeout,
-            context=context
+            context=context,
+            device_id=device_id,
+            api_key=api_key,
+            outlet=outlet,
         )
 
     @property
@@ -70,10 +80,10 @@ class SonoffSwitch(SonoffDevice):
         :rtype: str
         """
         try:
-            state = self.params['switch']
-        except:
+            state = self.params["switch"]
+        except: # noqa
             state = SonoffSwitch.SWITCH_STATE_UNKNOWN
-        
+
         if state == "off":
             return SonoffSwitch.SWITCH_STATE_OFF
         elif state == "on":
@@ -108,8 +118,8 @@ class SonoffSwitch(SonoffDevice):
         Returns whether device is on.
         :return: True if device is on, False otherwise
         """
-        if 'switch' in self.params:
-            return self.params['switch'] == "on"
+        if "switch" in self.params:
+            return self.params["switch"] == "on"
 
         return False
 
@@ -158,14 +168,14 @@ class SonoffSwitch(SonoffDevice):
             if self.is_off:
                 self.logger.debug(
                     "Inching switch activated, waiting %ss before "
-                    "turning OFF again" % self.inching_seconds)
-
-                inching_task = self.loop.call_later(
-                    self.inching_seconds,
-                    self.callback_to_turn_off_inching
+                    "turning OFF again" % self.inching_seconds
                 )
 
-                self.tasks.append(inching_task)        
+                inching_task = self.loop.call_later(
+                    self.inching_seconds, self.callback_to_turn_off_inching
+                )
+
+                self.tasks.append(inching_task)
                 await self.turn_on()
         else:
             self.logger.debug("Not inching switch, calling parent callback")

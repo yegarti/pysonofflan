@@ -51,7 +51,7 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 pysonofflan tests
+	flake8 pysonofflanr3 tests
 
 test: ## run tests quickly with the default Python
 	python setup.py test
@@ -60,7 +60,7 @@ test-all: ## run tests on every Python version with tox
 	tox
 
 coverage: ## check code coverage quickly with the default Python
-	coverage run --source pysonofflan setup.py test
+	coverage run --source pysonofflanr3 setup.py test
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html

@@ -1,4 +1,4 @@
-Welcome to pySonoffLAN's documentation!
+Welcome to pySonoffLANR3's documentation!
 ======================================
 
 .. toctree::
@@ -7,11 +7,10 @@ Welcome to pySonoffLAN's documentation!
 
    readme
    installation
-   usage
-   modules
    contributing
    authors
    history
+   encryption
 
 Indices and tables
 ==================

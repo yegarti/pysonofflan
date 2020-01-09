@@ -64,7 +64,8 @@ class SonoffLANModeDeviceMock:
                     print("wrong device")
 
                 return (
-                    json.dumps({"seq": 1, "sequence": "1577725767", "error": 0}),
+                    json.dumps({"seq": 1,
+                                "sequence": "1577725767", "error": 0}),
                     200,
                 )
 

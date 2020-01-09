@@ -37,7 +37,7 @@ pysonofflanr3
 
 .. image:: https://www.buymeacoffee.com/assets/img/guidelines/download-assets-sm-2.svg
     :target: https://www.buymeacoffee.com/XTOsBAc
-    :alt: Say Thanks
+    :alt: Buy Me A Coffee
 
 Control Sonoff devices running original firmware, in LAN mode.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

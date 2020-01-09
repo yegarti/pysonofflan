@@ -54,7 +54,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pySonoffLANR3'
-copyright = u"2019-2020, Matt Saxon, Andrew Beveridge"
+copyright = u"2019-2020, Matt Saxon, 2019 Andrew Beveridge"
 author = u"Matt Saxon"
 
 # The version info for the project you're documenting, acts as replacement

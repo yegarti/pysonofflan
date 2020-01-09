@@ -54,17 +54,23 @@ class SonoffLANModeDeviceMock:
         # pylint: disable=unused-variable
         def post_switch():
 
-            print("Device %s, Received: %s" % (self._name, request.json))
+            try:
 
-            if request.json["deviceid"] == self._name:
-                self.process_request(request.json)
-            else:
-                print("wrong device")
+                print("Device %s, Received: %s" % (self._name, request.json))
 
-            return (
-                json.dumps({"seq": 1, "sequence": "1577725767", "error": 0}),
-                200,
-            )
+                if request.json["deviceid"] == self._name:
+                    self.process_request(request.json)
+                else:
+                    print("wrong device")
+
+                return (
+                    json.dumps({"seq": 1,
+                                "sequence": "1577725767", "error": 0}),
+                    200,
+                )
+
+            except Exception as Ex:
+                print(Ex)
 
         def start():
             api.run(host=self._ip, port=self._port)
@@ -178,7 +184,7 @@ class SonoffLANModeDeviceMock:
             data = sonoffcrypto.decrypt(json_["data"], iv, self._api_key)
             import json
 
-            data = json.loads(data)
+            data = json.loads(data.decode('utf-8'))
 
         else:
             print(json_)

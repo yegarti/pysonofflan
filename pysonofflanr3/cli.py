@@ -6,7 +6,7 @@ import click
 import click_log
 from click_log import ClickHandler
 
-from . import SonoffSwitch, Discover
+from pysonofflanr3 import SonoffSwitch, Discover
 
 if sys.version_info < (3, 5):
     print("To use this script you need python 3.5 or newer! got %s"

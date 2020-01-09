@@ -8,7 +8,7 @@ import collections
 import requests
 from zeroconf import ServiceBrowser, Zeroconf
 
-from . import sonoffcrypto
+from pysonofflanr3 import sonoffcrypto
 import socket
 
 
@@ -279,7 +279,7 @@ class SonoffLANModeClient:
             response = self.send(request, self.url + "/zeroconf/switch")
 
         try:
-            response_json = json.loads(response.content)
+            response_json = json.loads(response.content.decode('utf-8'))
 
             error = response_json["error"]
 

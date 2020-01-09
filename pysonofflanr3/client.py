@@ -8,7 +8,7 @@ import collections
 import requests
 from zeroconf import ServiceBrowser, Zeroconf
 
-from . import sonoffcrypto
+from pysonofflanr3 import sonoffcrypto
 import socket
 
 

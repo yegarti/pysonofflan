@@ -10,7 +10,7 @@ from typing import Callable, Awaitable, Dict
 
 import traceback
 
-from .client import SonoffLANModeClient
+from pysonofflanr3 import SonoffLANModeClient
 
 
 class SonoffDevice(object):

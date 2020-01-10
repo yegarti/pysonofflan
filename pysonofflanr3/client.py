@@ -332,7 +332,6 @@ class SonoffLANModeClient:
 
         self._last_params = params
 
-        """ Hack for multi outlet switches, needs improving """
         if self.type == b"strip":
 
             if self.outlet is None:

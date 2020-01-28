@@ -22,4 +22,11 @@ To capture the api_key there are a number of options;
 
 * Capture during pairing using a network trace tool. 'tcpdump' is a popular tool and can be run on an OpenWRT router. This is the route which needs the most technical expertise, but seems to be the only viable way in certain circumstances.
 
-* There is another article [here](https://community.hubitat.com/t/sonoff-ewelink-via-homebridge-node/3753) explaining another method
+1. Connect to the router with ssh or telnet from your PC
+2. Connect your mobile to the router SSID
+3. Execute this command in the WRT router: “tcpdump -s 0 -vvv -i eth1 -w outputfile”
+4. Register the sonoff in the eWeLink App
+5. Stop the tcpdump (Ctrl-C)
+6. Excute the command “grep apikey outputfile” in the router
+7. You will get the apikey like this:
+{“type”:1,“deviceid”:“xxxxxxxxxx”,“apikey”:"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",“rptInfo”:{“code”:3100,“arg”:"{“rstReason”:0}"},“sequence”:“0845895318697”}^/G

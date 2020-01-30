@@ -30,3 +30,13 @@ To capture the api_key there are a number of options;
 6. Excute the command “grep apikey outputfile” in the router
 7. You will get the apikey like this:
 {“type”:1,“deviceid”:“xxxxxxxxxx”,“apikey”:"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",“rptInfo”:{“code”:3100,“arg”:"{“rstReason”:0}"},“sequence”:“0845895318697”}^/G
+
+* Capture via Charles Proxy
+
+This is a method which shows how to do it
+https://community.home-assistant.io/t/new-custom-component-sonoff-lan-mode-local-with-stock-firmware/88132/99?u=mattsaxon
+
+It's based on these instructions here;
+https://community.hubitat.com/t/sonoff-ewelink-via-homebridge-node/3753
+
+Thanks to @SuperMario

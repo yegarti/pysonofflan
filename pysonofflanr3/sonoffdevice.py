@@ -250,7 +250,7 @@ class SonoffDevice(object):
                         "Unexpected error for device %s: %s %s",
                         self.device_id,
                         format(ex),
-                        traceback.format_exc,
+                        traceback.format_exc(),
                     )
                     break
 
@@ -263,7 +263,7 @@ class SonoffDevice(object):
                 "Unexpected error for device %s: %s %s",
                 self.device_id,
                 format(ex),
-                traceback.format_exc,
+                traceback.format_exc(),
             )
 
         finally:
@@ -366,7 +366,7 @@ class SonoffDevice(object):
                 "Unexpected error in handle_message() for device %s: %s %s",
                 self.device_id,
                 format(ex),
-                traceback.format_exc,
+                traceback.format_exc(),
             )
 
     def shutdown_event_loop(self):

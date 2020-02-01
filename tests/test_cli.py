@@ -68,7 +68,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_on(self):
 
-        start_device("PlugOn", "plug")
+        start_device("PlugOnMock", "plug")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -82,7 +82,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_off(self):
 
-        start_device("PlugOff", "plug")
+        start_device("PlugOffMock", "plug")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -96,7 +96,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_on_strip(self):
 
-        start_device("StripOn", "strip")
+        start_device("StripOnMock", "strip")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -110,7 +110,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_off_strip(self):
 
-        start_device("StripOff", "strip")
+        start_device("StripOffMock", "strip")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -124,7 +124,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_on_encrypt(self):
 
-        start_device("PlugEncrypt", "plug", "testkey")
+        start_device("PlugEncryptMock", "plug", "testkey")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -139,7 +139,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_on_strip_encrypt(self):
 
-        start_device("StripEncrypt", "strip", "testkey")
+        start_device("StripEncryptMock", "strip", "testkey")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -157,7 +157,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_discover(self):
 
-        start_device("DiscoverDevice", "plug")
+        start_device("DiscoverMock", "plug")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -169,7 +169,7 @@ class TestCLI(unittest.TestCase):
             "Attempting to discover Sonoff LAN Mode devices on the local "
             "network" in result.output
         )
-        assert "DiscoverDevice" in result.output
+        assert "DiscoverMock" in result.output
 
         stop_device()
 

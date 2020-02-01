@@ -11,9 +11,16 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=7.0', 'click_log', 'pycryptodome', 'requests', 'zeroconf>=0.23.0']
+requirements = ['Click>=7.0', 'click_log', 'pycryptodome', 'requests', 'zeroconf>=0.24.4']
 setup_requirements = []
 test_requirements = ['pytest', 'tox', 'python-coveralls', 'flask', 'flake8']
+
+PROJECT_URLS = {
+    "Home Assistant component": "https://github.com/mattsaxon/sonoff-lan-mode-homeassistant/",
+    "Bug Reports": "https://github.com/mattsaxon/pysonofflan/issues/",
+    "Component Docs": "https://pysonofflanr3.readthedocs.io/",
+    "Itead Dev Docs": "https://github.com/itead/Sonoff_Devices_DIY_Tools/tree/master/other/"
+}
 
 setup(
     author="Matt Saxon",
@@ -40,13 +47,14 @@ setup(
     license="MIT license",
     long_description=readme + '\n\n' + history,
     include_package_data=True,
-    keywords='pysonofflanr3',
+    keywords='pysonofflanr3, homeassistant',
     name='pysonofflanr3',
     packages=find_packages(include=['pysonofflanr3']),
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/mattsaxon/pysonofflan',
-    version='1.1.0',
+    url='https://github.com/mattsaxon/pysonofflanr3',
+    project_urls=PROJECT_URLS,
+    version='1.1.1',
     zip_safe=False,
 )

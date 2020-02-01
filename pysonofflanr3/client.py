@@ -18,7 +18,7 @@ class SonoffLANModeClient:
 
     Uses protocol as was documented documented by Itead
 
-    This documented has since been unpublished
+    This document has since been unpublished
     """
 
     """
@@ -33,6 +33,7 @@ class SonoffLANModeClient:
     DEFAULT_PING_INTERVAL = 5
     SERVICE_TYPE = "_ewelink._tcp.local."
 
+    # only a single zeroconf instance for all instances of this class
     zeroconf = Zeroconf()
 
     def __init__(
@@ -63,7 +64,7 @@ class SonoffLANModeClient:
         self.last_request = None
         self.encrypted = False
         self.type = None
-
+        self._info_cache = None
         self._last_params = {"switch": "off"}
 
         if self.logger is None:
@@ -102,9 +103,6 @@ class SonoffLANModeClient:
                 self.logger.debug("Service %s added (again)" % name)
                 self.my_service_name = None
 
-            # else:
-            #    self.logger.debug("Service %s added (not our switch)" % name)
-
         if self.my_service_name is None:
 
             info = zeroconf.get_service_info(type, name)
@@ -140,6 +138,7 @@ class SonoffLANModeClient:
                                  )
 
                 # listen for updates to the specific device
+                # (needed for zerconf 0.23.0, 0.24.0, fixed in later versions)
                 self.service_browser = \
                     ServiceBrowser(zeroconf, name, listener=self)
 
@@ -160,6 +159,7 @@ class SonoffLANModeClient:
                 )
 
                 # self.http_session.headers.update(headers)
+                # needed to keep headers in same order
                 self.http_session.headers = headers
 
                 # find socket for end-point
@@ -187,58 +187,71 @@ class SonoffLANModeClient:
 
     def update_service(self, zeroconf, type, name):
 
-        # This is only needed for zderoconfg 0.24.1 to 0.24.4
-        if self.my_service_name == name:
+        # This is needed for zeroconfg 0.24.1
+        # onwards as updates come to the parent node
+        if self.my_service_name != name:
+            return
 
-            try:
-                info = zeroconf.get_service_info(type, name)
-                self.logger.debug("properties: %s", info.properties)
+        try:
+            info = zeroconf.get_service_info(type, name)
 
-                self.type = info.properties.get(b"type")
-                self.logger.debug("type: %s", self.type)
+            # This is useful optimsation for 0.24.1 onwards
+            # as multiple updates that are the same are received
+            if info.properties == self._info_cache:
+                self.logger.debug("same update received for device: %s", name)
+                return
+            else:
+                self._info_cache = info.properties
 
-                data1 = info.properties.get(b"data1")
-                data2 = info.properties.get(b"data2")
+            self.logger.debug("properties: %s", info.properties)
 
-                if data2 is not None:
-                    data1 += data2
-                    data3 = info.properties.get(b"data3")
+            self.type = info.properties.get(b"type")
+            self.logger.debug("type: %s", self.type)
 
-                    if data3 is not None:
-                        data1 += data3
-                        data4 = info.properties.get(b"data4")
+            data1 = info.properties.get(b"data1")
+            data2 = info.properties.get(b"data2")
 
-                        if data4 is not None:
-                            data1 += data4
+            if data2 is not None:
+                data1 += data2
+                data3 = info.properties.get(b"data3")
 
-                if info.properties.get(b"encrypt"):
-                    self.encrypted = True
-                    # decrypt the message
-                    iv = info.properties.get(b"iv")
-                    data = sonoffcrypto.decrypt(data1, iv, self.api_key)
-                    self.logger.debug("decrypted data: %s", data)
+                if data3 is not None:
+                    data1 += data3
+                    data4 = info.properties.get(b"data4")
 
-                else:
-                    self.encrypted = False
-                    data = data1
+                    if data4 is not None:
+                        data1 += data4
 
-                self.properties = info.properties
+            if info.properties.get(b"encrypt"):
+                self.encrypted = True
+                # decrypt the message
+                iv = info.properties.get(b"iv")
+                data = sonoffcrypto.decrypt(data1, iv, self.api_key)
+                self.logger.debug("decrypted data: %s", data)
 
-                # process the events on an event loop
-                # this method is on a background thread called from zeroconf
-                asyncio.run_coroutine_threadsafe(
-                    self.event_handler(data), self.loop)
+            else:
+                self.encrypted = False
+                data = data1
 
-            except Exception as ex:
-                self.logger.error(
-                    "Error updating service for device %s: %s,"
-                    " probably wrong API key: %s",
-                    self.device_id,
-                    format(ex), name
-                )
+            self.properties = info.properties
 
-        else:
-            self.logger.debug("Service %s updated (not our switch)" % name)
+            # process the events on an event loop
+            # this method is on a background thread called from zeroconf
+            asyncio.run_coroutine_threadsafe(
+                self.event_handler(data), self.loop)
+
+        except ValueError as ex:
+            self.logger.error(
+                "Error updating service for device %s: %s"
+                " Probably wrong API key.",
+                self.device_id, format(ex)
+            )
+
+        except Exception as ex:
+            self.logger.error(
+                "Error updating service for device %s: %s, %s",
+                self.device_id, format(ex), traceback.format_exc()
+            )
 
     def retry_connection(self):
 
@@ -267,7 +280,7 @@ class SonoffLANModeClient:
                     "Retry_connection() Unexpected error for device %s: %s %s",
                     self.device_id,
                     format(ex),
-                    traceback.format_exc,
+                    traceback.format_exc(),
                 )
                 break
 

@@ -1,6 +1,12 @@
 History
 =======
 
+1.1.1 (2020-01-02)
+------------------
+
+* Optimisations to deal with later zeroconf versions which have some different behaviour
+* Improved error handling of unexpected errors
+
 1.1.0 (2020-01-10)
 ------------------
 

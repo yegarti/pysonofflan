@@ -34,7 +34,6 @@ def format_encryption_msg(payload, api_key, data):
     payload["encrypt"] = True
 
     if data is None:
-        # data["data"] = encrypt("{ }", iv)
         payload["data"] = ""
     else:
         payload["data"] = \

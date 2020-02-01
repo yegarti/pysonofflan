@@ -21,14 +21,13 @@ class SonoffLANModeDeviceMock:
         if self._name is None:
             self._name = ""
 
-        self._name += "Mock"
-
         print("Device __init__ %s" % self._name)
 
         if self._sonoff_type is None:
             self._sonoff_type = "plug"
 
         if self._api_key == "None" or self._api_key is None:
+            print("No Encryption")
             self._encrypt = False
         else:
             self._encrypt = True
@@ -204,7 +203,15 @@ def start_device(
     name=None, sonoff_type=None, api_key=None, ip=None, port=None
 ):
 
+    # device = SonoffLANModeDeviceMock(name, sonoff_type, "None", ip, port)
+    # device = None
+    # device = SonoffLANModeDeviceMock(name, sonoff_type, api_key, ip, port)
+    # device = None
+    # device = SonoffLANModeDeviceMock(name, sonoff_type, "None", ip, port)
+    # device = None
     device = SonoffLANModeDeviceMock(name, sonoff_type, api_key, ip, port)
+    # device = None
+    # device = SonoffLANModeDeviceMock(name, sonoff_type, None, ip, port)
     device.run_server()
 
 

@@ -1,7 +1,7 @@
 History
 =======
 
-1.1.1 (2020-01-02)
+1.1.1 (2020-02-01)
 ------------------
 
 * Optimisations to deal with later zeroconf versions which have some different behaviour

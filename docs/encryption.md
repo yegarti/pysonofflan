@@ -24,11 +24,9 @@ To capture the api_key there are a number of options;
 
 1. Connect to the router with ssh or telnet from your PC
 2. Connect your mobile to the router SSID
-3. Execute this command in the WRT router: “tcpdump -s 0 -vvv -i eth1 -w outputfile”
+3. Execute this command in the WRT router: “tcpdump -s 0 -vvv -i wlan1 -w | grep apikey” (you may need to substitute wlan1 for the correct interface)
 4. Register the sonoff in the eWeLink App
-5. Stop the tcpdump (Ctrl-C)
-6. Excute the command “grep apikey outputfile” in the router
-7. You will get the apikey like this:
+5. You will get the apikey displayed like this:
 {“type”:1,“deviceid”:“xxxxxxxxxx”,“apikey”:"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",“rptInfo”:{“code”:3100,“arg”:"{“rstReason”:0}"},“sequence”:“0845895318697”}^/G
 
 * Capture via Charles Proxy

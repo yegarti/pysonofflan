@@ -181,6 +181,36 @@ class TestCLI(unittest.TestCase):
             "Looking for all eWeLink devices on local network" in result.output
         )
 
+    def test_cli_no_key(self):
+
+        start_device("PlugEncryptMock2", "plug", "testkey")
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(
+            cli.cli,
+            ["--device_id", "PlugEncryptMock2", "state"],
+        )
+
+        print(result.output)
+
+        assert "encoding without a string argument" in result.output
+
+    def test_cli_wrong_key(self):
+
+        start_device("PlugEncryptMock3", "plug", "testkey")
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(
+            cli.cli,
+            ["--device_id", "PlugEncryptMock3", "--api_key", "badkey", "state"],
+        )
+
+        print(result.output)
+
+        assert "Padding is incorrect" in result.output
+
 
 if __name__ == "__main__":
     unittest.main()

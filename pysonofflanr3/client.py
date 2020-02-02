@@ -247,11 +247,28 @@ class SonoffLANModeClient:
                 self.device_id, format(ex)
             )
 
+            asyncio.run_coroutine_threadsafe(
+                self.event_handler(None), self.loop)
+
+        except TypeError as ex:
+            self.logger.error(
+                "Error updating service for device %s: %s"
+                " Probably missing API key.",
+                self.device_id, format(ex)
+            )
+
+            asyncio.run_coroutine_threadsafe(
+                self.event_handler(None), self.loop)
+
+
         except Exception as ex:
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
                 self.device_id, format(ex), traceback.format_exc()
             )
+
+            asyncio.run_coroutine_threadsafe(
+                self.event_handler(None), self.loop)
 
     def retry_connection(self):
 

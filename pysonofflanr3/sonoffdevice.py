@@ -281,6 +281,11 @@ class SonoffDevice(object):
             self.logger.debug("unnecessary update received, ignoring")
 
     async def handle_message(self, message):
+
+        # Null message shuts us down
+        if message is None:
+            self.shutdown_event_loop()
+
         """
         Receive message sent by the device and handle it, either updating
         state or storing basic device info

@@ -260,7 +260,6 @@ class SonoffLANModeClient:
             asyncio.run_coroutine_threadsafe(
                 self.event_handler(None), self.loop)
 
-
         except Exception as ex:
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
@@ -330,10 +329,6 @@ class SonoffLANModeClient:
                 "error %s processing response: %s, %s",
                 format(ex), response, response.content
             )
-
-        finally:
-
-            return
 
     def send_signal_strength(self):
 

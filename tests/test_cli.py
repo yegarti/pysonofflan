@@ -204,7 +204,7 @@ class TestCLI(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(
             cli.cli,
-            ["--device_id", "PlugEncryptMock3", "--api_key", "badkey", "state"],
+            ["--device_id", "PlugEncryptMock3", "--api_key", "bad", "state"],
         )
 
         print(result.output)

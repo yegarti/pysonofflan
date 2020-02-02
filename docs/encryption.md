@@ -20,7 +20,7 @@ To capture the api_key there are a number of options;
 
 * Capture during pairing using a browser: You can use the method described [here](https://blog.ipsumdomus.com/sonoff-switch-complete-hack-without-firmware-upgrade-1b2d6632c01). Despite this guide being quite old and for older firmware, the early part where the api_key is uncovered still works for some devices. Unfortunately this is only visible this way during pairing
 
-* Capture during pairing using a network trace tool. 'tcpdump' is a popular tool and can be run on an OpenWRT router. This is the route which needs the most technical expertise, but seems to be the only viable way in certain circumstances.
+* Capture using a network trace tool. 'tcpdump' is a popular tool and can be run on an OpenWRT router. The key is visible during pairing, also sometimes it is visibile when the device starts up (not sure if this is device or firmware specific)
 
 1. Connect to the router with ssh or telnet from your PC
 2. Connect your mobile to the router SSID
@@ -38,3 +38,9 @@ It's based on these instructions here;
 https://community.hubitat.com/t/sonoff-ewelink-via-homebridge-node/3753
 
 Thanks to @SuperMario
+
+## Notes on the api_key
+* For a given device, it is constant, it doesn't change with repairing for example
+* It is different for every device
+* It is not needed for a given device if it is in DIY mode (though it returns to the original key if you put it back in standard mode)
+* It is not the same as the selfApiKey that can be found in traces.

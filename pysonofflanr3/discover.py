@@ -51,9 +51,9 @@ class MyListener:
         device = info.properties[b"id"].decode("ascii")
         ip = self.parseAddress(info.address) + ":" + str(info.port)
 
-        self.logger.info("Found Sonoff LAN Mode device %s at socket %s"
-                         % (device, ip)
-                         )
+        self.logger.info(
+            "Found Sonoff LAN Mode device %s at socket %s" % (device, ip)
+        )
 
         self.devices[device] = ip
 

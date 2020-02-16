@@ -25,9 +25,7 @@ import json
 
 def format_encryption_msg(payload, api_key, data):
 
-    payload[
-        "selfApikey"
-    ] = "123"
+    payload["selfApikey"] = "123"
     # see https://github.com/itead/Sonoff_Devices_DIY_Tools/issues/5)
     iv = generate_iv()
     payload["iv"] = b64encode(iv).decode("utf-8")
@@ -36,8 +34,9 @@ def format_encryption_msg(payload, api_key, data):
     if data is None:
         payload["data"] = ""
     else:
-        payload["data"] = \
-            encrypt(json.dumps(data, separators=(",", ":")), iv, api_key)
+        payload["data"] = encrypt(
+            json.dumps(data, separators=(",", ":")), iv, api_key
+        )
 
 
 def format_encryption_txt(properties, data, api_key):

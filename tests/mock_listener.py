@@ -4,7 +4,6 @@ from zeroconf import ServiceBrowser, Zeroconf
 
 
 class MyListener:
-
     def remove_service(self, zeroconf, type, name):
 
         global name_filter
@@ -48,8 +47,9 @@ if __name__ == "__main__":
     zeroconf = Zeroconf()
     listener = MyListener()
 
-    listener.browser = \
-        ServiceBrowser(zeroconf, "_ewelink._tcp.local.", listener)
+    listener.browser = ServiceBrowser(
+        zeroconf, "_ewelink._tcp.local.", listener
+    )
 
     try:
         input("Press enter to exit...\n\n")

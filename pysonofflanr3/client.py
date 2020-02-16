@@ -66,6 +66,7 @@ class SonoffLANModeClient:
         self.type = None
         self._info_cache = None
         self._last_params = {"switch": "off"}
+        self._times_added = 0
 
         if self.logger is None:
             self.logger = logging.getLogger(__name__)
@@ -92,6 +93,7 @@ class SonoffLANModeClient:
     def remove_service(self, zeroconf, type, name):
 
         if self.my_service_name == name:
+            self._info_cache = None
             self.logger.debug("Service %s flagged for removal" % name)
             self.loop.run_in_executor(None, self.retry_connection)
 
@@ -100,8 +102,15 @@ class SonoffLANModeClient:
         if self.my_service_name is not None:
 
             if self.my_service_name == name:
-                self.logger.debug("Service %s added (again)" % name)
+                self._times_added += 1
+                self.logger.info(
+                    "Service %s added again (%s times)"
+                    % (name, self._times_added)
+                )
                 self.my_service_name = None
+                asyncio.run_coroutine_threadsafe(
+                    self.event_handler({}), self.loop
+                )
 
         if self.my_service_name is None:
 
@@ -133,14 +142,15 @@ class SonoffLANModeClient:
 
             if self.my_service_name is not None:
 
-                self.logger.info("Service type %s of name %s added",
-                                 type, name
-                                 )
+                self.logger.info(
+                    "Service type %s of name %s added", type, name
+                )
 
                 # listen for updates to the specific device
                 # (needed for zerconf 0.23.0, 0.24.0, fixed in later versions)
-                self.service_browser = \
-                    ServiceBrowser(zeroconf, name, listener=self)
+                self.service_browser = ServiceBrowser(
+                    zeroconf, name, listener=self
+                )
 
                 # create an http session so we can use http keep-alives
                 self.http_session = requests.Session()
@@ -178,9 +188,9 @@ class SonoffLANModeClient:
                     method_whitelist=["POST"],
                     status_forcelist=None,
                 )
-                self.http_session.mount("http://", HTTPAdapter(
-                                        max_retries=retries)
-                                        )
+                self.http_session.mount(
+                    "http://", HTTPAdapter(max_retries=retries)
+                )
 
                 # process the initial message
                 self.update_service(zeroconf, type, name)
@@ -238,36 +248,44 @@ class SonoffLANModeClient:
             # process the events on an event loop
             # this method is on a background thread called from zeroconf
             asyncio.run_coroutine_threadsafe(
-                self.event_handler(data), self.loop)
+                self.event_handler(data), self.loop
+            )
 
         except ValueError as ex:
             self.logger.error(
                 "Error updating service for device %s: %s"
                 " Probably wrong API key.",
-                self.device_id, format(ex)
+                self.device_id,
+                format(ex),
             )
 
             asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop)
+                self.event_handler(None), self.loop
+            )
 
         except TypeError as ex:
             self.logger.error(
                 "Error updating service for device %s: %s"
                 " Probably missing API key.",
-                self.device_id, format(ex)
+                self.device_id,
+                format(ex),
             )
 
             asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop)
+                self.event_handler(None), self.loop
+            )
 
         except Exception as ex:
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
-                self.device_id, format(ex), traceback.format_exc()
+                self.device_id,
+                format(ex),
+                traceback.format_exc(),
             )
 
             asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop)
+                self.event_handler(None), self.loop
+            )
 
     def retry_connection(self):
 
@@ -278,16 +296,18 @@ class SonoffLANModeClient:
                 )
                 self.send_signal_strength()
                 self.logger.info(
-                    "Service %s not removed (hack worked)" % self.device_id
+                    "Service %s flagged for removal, but is still active!"
+                    % self.device_id
                 )
                 break
 
             except OSError as ex:
                 self.logger.debug(
                     "Connection issue for device %s: %s",
-                    self.device_id, format(ex)
+                    self.device_id,
+                    format(ex),
                 )
-                self.logger.warn("Service %s removed" % self.device_id)
+                self.logger.info("Service %s removed" % self.device_id)
                 self.close_connection()
                 break
 
@@ -308,12 +328,12 @@ class SonoffLANModeClient:
             response = self.send(request, self.url + "/zeroconf/switch")
 
         try:
-            response_json = json.loads(response.content.decode('utf-8'))
+            response_json = json.loads(response.content.decode("utf-8"))
 
             error = response_json["error"]
 
             if error != 0:
-                self.logger.warn(
+                self.logger.warning(
                     "error received: %s, %s", self.device_id, response.content
                 )
                 # no need to process error, retry will resend message
@@ -327,15 +347,24 @@ class SonoffLANModeClient:
         except Exception as ex:
             self.logger.error(
                 "error %s processing response: %s, %s",
-                format(ex), response, response.content
+                format(ex),
+                response,
+                response.content,
             )
 
     def send_signal_strength(self):
 
-        return self.send(
+        response = self.send(
             self.get_update_payload(self.device_id, {}),
             self.url + "/zeroconf/signal_strength",
         )
+
+        if response.status_code == 500:
+            self.logger.error("500 received")
+            raise OSError
+
+        else:
+            return response
 
     def send(self, request: Union[str, Dict], url):
         """
@@ -348,8 +377,9 @@ class SonoffLANModeClient:
         data = json.dumps(request, separators=(",", ":"))
         self.logger.debug("Sending http message to %s: %s", url, data)
         response = self.http_session.post(url, data=data)
-        self.logger.debug("response received: %s %s",
-                          response, response.content)
+        self.logger.debug(
+            "response received: %s %s", response, response.content
+        )
 
         return response
 
@@ -357,7 +387,7 @@ class SonoffLANModeClient:
 
         self._last_params = params
 
-        if self.type == b"strip":
+        if self.type == b"strip" and params != {} and params is not None:
 
             if self.outlet is None:
                 self.outlet = 0
@@ -380,7 +410,8 @@ class SonoffLANModeClient:
 
             if self.api_key != "" and self.api_key is not None:
                 sonoffcrypto.format_encryption_msg(
-                    payload, self.api_key, params)
+                    payload, self.api_key, params
+                )
                 self.logger.debug("encrypted: %s", payload)
 
             else:

@@ -31,8 +31,9 @@ class SonoffSwitch(SonoffDevice):
     def __init__(
         self,
         host: str,
-        callback_after_update:
-            Callable[[SonoffDevice], Awaitable[None]] = None,
+        callback_after_update: Callable[
+            [SonoffDevice], Awaitable[None]
+        ] = None,
         shared_state: Dict = None,
         inching_seconds: int = None,
         logger=None,
@@ -81,7 +82,7 @@ class SonoffSwitch(SonoffDevice):
         """
         try:
             state = self.params["switch"]
-        except: # noqa
+        except:  # noqa
             state = SonoffSwitch.SWITCH_STATE_UNKNOWN
 
         if state == "off":
@@ -159,7 +160,8 @@ class SonoffSwitch(SonoffDevice):
 
         if self.basic_info is None:
             self.logger.debug(
-                "Basic info still none, waiting for init message")
+                "Basic info still none, waiting for init message"
+            )
             return
 
         if self.inching_seconds is not None:

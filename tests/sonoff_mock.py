@@ -1,7 +1,9 @@
 import sys
 import socket
+import time
 import threading
-from flask import Flask, json, request
+import subprocess
+from flask import Flask, json, request, abort
 from zeroconf import Zeroconf, ServiceInfo
 from pysonofflanr3 import sonoffcrypto
 
@@ -9,14 +11,33 @@ from pysonofflanr3 import sonoffcrypto
 next_port = 8082  # to stop conflicting with command line by default
 
 
+class MockController:
+    def __init__(self, cmd):
+
+        self._p = subprocess.Popen(["python", "sonoff_mock.py", cmd])
+        self._p.start()
+
+    def stop_server(self):
+        self._p.terminate()
+
+    def stop_server_in(self, seconds):
+        def stop(self, seconds):
+            time.sleep(seconds)
+            self.stop_server()
+
+        self._p = threading.Thread(target=stop)
+        self._p.start()
+
+
 class SonoffLANModeDeviceMock:
-    def __init__(self, name, sonoff_type, api_key, ip, port):
+    def __init__(self, name, sonoff_type, api_key, ip, port, error_mock=None):
 
         self._name = name
         self._sonoff_type = sonoff_type
         self._api_key = api_key
         self._ip = ip
         self._port = port
+        self._error_code = 0
 
         if self._name is None:
             self._name = ""
@@ -42,7 +63,69 @@ class SonoffLANModeDeviceMock:
 
         self._status = "off"
 
-        self.register_on_network()
+        self.register()
+
+        self.mock_error(error_mock)
+
+    def mock_error(self, error_mock):
+
+        if error_mock == "Disconnect":
+
+            def disconnect():
+                self.disconnect()
+
+            self._p = threading.Thread(target=disconnect)
+            self._p.start()
+
+        elif error_mock == "Reconnect":
+
+            def reconnect():
+                self.reconnect()
+
+            self._p = threading.Thread(target=reconnect)
+            self._p.start()
+
+    def reconnect(self):
+
+        try:
+            print("....waiting")
+
+            time.sleep(5)
+
+            print("....deregister")
+
+            self._error_code = 0
+            self.deregister()
+
+            time.sleep(5)
+
+            print("....register")
+
+            self.register()
+
+        except Exception as Ex:
+            print(Ex)
+
+    def disconnect(self):
+
+        try:
+            print("....waiting")
+
+            time.sleep(5)
+
+            print("....deregister")
+
+            self._error_code = 500
+            self.deregister()
+
+            time.sleep(5)
+
+            print("....register")
+
+            self.register()
+
+        except Exception as Ex:
+            print(Ex)
 
     def run_server(self):
 
@@ -59,17 +142,45 @@ class SonoffLANModeDeviceMock:
 
                 if request.json["deviceid"] == self._name:
                     self.process_request(request.json)
+
+                    return (
+                        json.dumps(
+                            {"seq": 1, "sequence": "1577725767", "error": 0}
+                        ),
+                        200,
+                    )
+
                 else:
                     print("wrong device")
-
-                return (
-                    json.dumps({"seq": 1,
-                                "sequence": "1577725767", "error": 0}),
-                    200,
-                )
+                    abort(404)
 
             except Exception as Ex:
                 print(Ex)
+                abort(500)
+
+        @api.route("/zeroconf/signal_strength", methods=["POST"])
+        # pylint: disable=unused-variable
+        def post_signal():
+
+            print("Device %s, Received: %s" % (self._name, request.json))
+
+            if request.json["deviceid"] == self._name:
+
+                if self._error_code != 0:
+                    abort(self._error_code)
+
+                else:
+
+                    return (
+                        json.dumps(
+                            {"seq": 1, "sequence": "1577725767", "error": 0}
+                        ),
+                        200,
+                    )
+
+            else:
+                print("wrong device")
+                abort(404)
 
         def start():
             api.run(host=self._ip, port=self._port)
@@ -80,13 +191,17 @@ class SonoffLANModeDeviceMock:
         t.start()
         print("device started: %s" % self._name)
 
-    def register_on_network(self):
+    def register(self):
 
         self._properties = dict(id=self._name, type=self._sonoff_type,)
 
         self.set_data()
         self._zeroconf_registrar = Zeroconf(interfaces=[self._ip])
         self._zeroconf_registrar.register_service(self.get_service_info())
+
+    def deregister(self):
+
+        self._zeroconf_registrar.unregister_service(self.get_service_info())
 
     def get_service_info(self):
 
@@ -108,35 +223,45 @@ class SonoffLANModeDeviceMock:
 
         if self._sonoff_type == "strip":
 
-            data = '{"sledOnline":"on",' \
-                '"configure":[' \
-                '{"startup":"off","outlet":0},{"startup":"off","outlet":1},' \
-                '{"startup":"off","outlet":2},{"startup":"off","outlet":3}],' \
-                '"pulses":[' \
-                '{"pulse":"off","width":1000,"outlet":0},' \
-                '{"pulse":"off","width":1000,"outlet":1},' \
-                '{"pulse":"off","width":1000,"outlet":2},' \
+            data = (
+                '{"sledOnline":"on",'
+                '"configure":['
+                '{"startup":"off","outlet":0},{"startup":"off","outlet":1},'
+                '{"startup":"off","outlet":2},{"startup":"off","outlet":3}],'
+                '"pulses":['
+                '{"pulse":"off","width":1000,"outlet":0},'
+                '{"pulse":"off","width":1000,"outlet":1},'
+                '{"pulse":"off","width":1000,"outlet":2},'
                 '{"pulse":"off","width":1000,"outlet":3}],'
+            )
 
             if self._status == "on":
-                data += '"switches":[{"switch":"on","outlet":0},' \
-                    '{"switch":"off","outlet":1},{"switch":"off",' \
+                data += (
+                    '"switches":[{"switch":"on","outlet":0},'
+                    '{"switch":"off","outlet":1},{"switch":"off",'
                     '"outlet":2},{"switch":"on","outlet":3}]}'
+                )
 
             else:
-                data += '"switches":[{"switch":"off","outlet":0},' \
-                    '{"switch":"off","outlet":1},' \
-                    '{"switch":"off","outlet":2},' \
+                data += (
+                    '"switches":[{"switch":"off","outlet":0},'
+                    '{"switch":"off","outlet":1},'
+                    '{"switch":"off","outlet":2},'
                     '{"switch":"on","outlet":3}]}'
+                )
 
         else:
 
             if self._status == "on":
-                data = '{"switch":"on","startup":"stay","pulse":"off",' \
+                data = (
+                    '{"switch":"on","startup":"stay","pulse":"off",'
                     '"sledOnline":"off","pulseWidth":500,"rssi":-55}'
+                )
             else:
-                data = '{"switch":"off","startup":"stay","pulse":"off",' \
+                data = (
+                    '{"switch":"off","startup":"stay","pulse":"off",'
                     '"sledOnline":"off","pulseWidth":500,"rssi":-55}'
+                )
 
         if self._encrypt:
             data = sonoffcrypto.format_encryption_txt(
@@ -183,7 +308,7 @@ class SonoffLANModeDeviceMock:
             data = sonoffcrypto.decrypt(json_["data"], iv, self._api_key)
             import json
 
-            data = json.loads(data.decode('utf-8'))
+            data = json.loads(data.decode("utf-8"))
 
         else:
             print(json_)
@@ -200,19 +325,15 @@ class SonoffLANModeDeviceMock:
 
 
 def start_device(
-    name=None, sonoff_type=None, api_key=None, ip=None, port=None
+    name=None, sonoff_type=None, api_key=None, ip=None, port=None, error=None
 ):
 
-    # device = SonoffLANModeDeviceMock(name, sonoff_type, "None", ip, port)
-    # device = None
-    # device = SonoffLANModeDeviceMock(name, sonoff_type, api_key, ip, port)
-    # device = None
-    # device = SonoffLANModeDeviceMock(name, sonoff_type, "None", ip, port)
-    # device = None
-    device = SonoffLANModeDeviceMock(name, sonoff_type, api_key, ip, port)
-    # device = None
-    # device = SonoffLANModeDeviceMock(name, sonoff_type, None, ip, port)
+    device = SonoffLANModeDeviceMock(
+        name, sonoff_type, api_key, ip, port, error
+    )
     device.run_server()
+
+    # device = MockController(name, sonoff_type, api_key, ip, port)
 
 
 def stop_device():
@@ -226,6 +347,7 @@ if __name__ == "__main__":
     api_key = None
     ip = None
     port = 8081  # use 8081 as default port form command line
+    error = None
 
     try:
         name = sys.argv[1]
@@ -233,10 +355,11 @@ if __name__ == "__main__":
         api_key = sys.argv[3]
         ip = sys.argv[4]
         port = int(sys.argv[5])
+        error = sys.argv[6]
     except IndexError:
         pass
 
-    start_device(name, sonoff_type, api_key, ip, port)
+    start_device(name, sonoff_type, api_key, ip, port, error)
 
     try:
         input("Press enter to exit...\n\n")

@@ -9,8 +9,10 @@ from click_log import ClickHandler
 from pysonofflanr3 import SonoffSwitch, Discover
 
 if sys.version_info < (3, 5):
-    print("To use this script you need python 3.5 or newer! got %s"
-          % sys.version_info)
+    print(
+        "To use this script you need python 3.5 or newer! got %s"
+        % sys.version_info
+    )
     sys.exit(1)
 
 
@@ -31,8 +33,9 @@ class CustomColorFormatter(click_log.ColorFormatter):
 
             prefix = self.formatTime(record, self.datefmt) + " - "
             if level in self.colors:
-                prefix += click.style("{}: ".format(level),
-                                      **self.colors[level])
+                prefix += click.style(
+                    "{}: ".format(level), **self.colors[level]
+                )
 
             msg = "\n".join(prefix + x for x in msg.splitlines())
             return msg
@@ -74,12 +77,18 @@ pass_config = click.make_pass_decorator(dict, ensure=True)
     envvar="PYSONOFFLAN_inching",
     required=False,
     help='Number of seconds of "on" time if this is an '
-         "Inching/Momentary switch.",
+    "Inching/Momentary switch.",
+)
+@click.option(
+    "--wait",
+    envvar="PYSONOFFLAN_wait",
+    required=False,
+    help="time to wait for listen.",
 )
 @click.pass_context
 @click_log.simple_verbosity_option(logger, "--loglevel", "-l")
 @click.version_option()
-def cli(ctx, host, device_id, api_key, inching):
+def cli(ctx, host, device_id, api_key, inching, wait):
     """A cli tool for controlling Sonoff Smart Switches/Plugs in LAN Mode."""
     if ctx.invoked_subcommand == "discover":
         return
@@ -94,6 +103,7 @@ def cli(ctx, host, device_id, api_key, inching):
         "device_id": device_id,
         "api_key": api_key,
         "inching": inching,
+        "wait": wait,
     }
 
 
@@ -105,8 +115,9 @@ def discover():
         "on the local network, please wait..."
     )
     found_devices = (
-        asyncio.get_event_loop().run_until_complete(
-                Discover.discover(logger)).items()
+        asyncio.get_event_loop()
+        .run_until_complete(Discover.discover(logger))
+        .items()
     )
     for found_device_id, ip in found_devices:
         logger.debug(
@@ -157,12 +168,21 @@ def listen(config: dict):
     """Connect to device, print state, then print updates until quit."""
 
     async def state_callback(self):
+
         if self.basic_info is not None:
             print_device_details(self)
 
             if self.shared_state["callback_counter"] == 0:
-                logger.info("Listening for updates forever...' \
-                'Press CTRL+C to quit.")
+                logger.info(
+                    "Listening for updates forever...' \
+                'Press CTRL+C to quit."
+                )
+            else:
+                if config["wait"] is not None:
+                    if self.shared_state["callback_counter"] >= int(
+                        config["wait"]
+                    ):
+                        self.shutdown_event_loop()
 
         self.shared_state["callback_counter"] += 1
 
@@ -184,15 +204,16 @@ def print_device_details(device):
         device_id = device.device_id
 
         logger.info(
-            click.style("== Device: %s (%s) =="
-                        % (device_id, device.host), bold=True)
+            click.style(
+                "== Device: %s (%s) ==" % (device_id, device.host), bold=True
+            )
         )
 
         logger.info(
             "State: "
             + click.style(
                 "ON" if device.is_on else "OFF",
-                fg="green" if device.is_on else "red"
+                fg="green" if device.is_on else "red",
             )
         )
 

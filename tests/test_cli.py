@@ -145,8 +145,15 @@ class TestCLI(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(
             cli.cli,
-            ["--device_id", "StripEncryptMock", "--api_key", "testkey",
-             "-l", "DEBUG", "on"],
+            [
+                "--device_id",
+                "StripEncryptMock",
+                "--api_key",
+                "testkey",
+                "-l",
+                "DEBUG",
+                "on",
+            ],
         )
 
         print(result.output)
@@ -188,8 +195,7 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(
-            cli.cli,
-            ["--device_id", "PlugEncryptMock2", "state"],
+            cli.cli, ["--device_id", "PlugEncryptMock2", "state"],
         )
 
         print(result.output)
@@ -209,7 +215,142 @@ class TestCLI(unittest.TestCase):
 
         print(result.output)
 
-        assert "Padding is incorrect" in result.output
+        assert "Probably wrong API key" in result.output
+
+    def test_cli_reconnect(self):
+
+        start_device("ReconnectMock", "plug", None, None, None, "Reconnect")
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(
+            cli.cli,
+            [
+                "--device_id",
+                "ReconnectMock",
+                "-l",
+                "INFO",
+                "--wait",
+                "2",
+                "listen",
+            ],
+        )
+
+        print(result.output)
+
+        assert "still active!" in result.output
+        assert "added again" in result.output
+
+        stop_device()
+
+    def test_cli_reconnect_strip(self):
+
+        start_device(
+            "ReconnectStripMock", "strip", None, None, None, "Reconnect"
+        )
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(
+            cli.cli,
+            [
+                "--device_id",
+                "ReconnectStripMock",
+                "-l",
+                "INFO",
+                "--wait",
+                "2",
+                "listen",
+            ],
+        )
+
+        print(result.output)
+
+        assert "still active!" in result.output
+        assert "added again" in result.output
+
+        stop_device()
+
+    def test_cli_disconnect(self):
+
+        start_device("DisconnectMock", "strip", None, None, None, "Disconnect")
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(
+            cli.cli,
+            [
+                "--device_id",
+                "DisconnectMock",
+                "-l",
+                "INFO",
+                "--wait",
+                "3",
+                "listen",
+            ],
+        )
+
+        print(result.output)
+
+        assert "removed" in result.output
+        assert "added" in result.output
+        assert "sending 'available'" in result.output.partition("removed")[2]
+
+        stop_device()
+
+    def test_cli_disconnect_encrypt(self):
+
+        start_device(
+            "DisconnectEncryptMock",
+            "strip",
+            "testkey",
+            None,
+            None,
+            "Disconnect",
+        )
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(
+            cli.cli,
+            [
+                "--device_id",
+                "DisconnectEncryptMock",
+                "--api_key",
+                "testkey",
+                "-l",
+                "INFO",
+                "--wait",
+                "3",
+                "listen",
+            ],
+        )
+
+        print(result.output)
+
+        assert "removed" in result.output
+        assert "added" in result.output
+        assert "sending 'available'" in result.output.partition("removed")[2]
+
+        stop_device()
+
+    """
+    def test_cli_on_off(self):
+
+        start_device("InchingMock", "plug")
+
+        # Test the CLI.
+        runner = CliRunner()
+        result = runner.invoke(cli.cli, ["--device_id",
+             "InchingMock", "--inching", "2", "on"])
+
+        print(result.output)
+
+        assert "info: State: ON" in result.output
+        assert "info: State: OFF" in result.output.partition("State: ON")[2]
+
+        stop_device()
+    """
 
 
 if __name__ == "__main__":

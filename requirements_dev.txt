@@ -7,8 +7,8 @@ Sphinx==2.4.1
 pytest==5.3.5
 twine==3.1.1
 click==7.0
+pycryptodome==3.9.6
 coveralls==1.11.1
-pycryptodome==3.9.4
 zeroconf==0.24.4
 flask==1.1.1
 requests==2.22.0

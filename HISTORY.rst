@@ -1,7 +1,7 @@
 History
 =======
 
-1.1.2 (2020-02-15)
+1.1.2 (2020-02-16)
 ------------------
 
 * Fixed issue of reconnection that device remains unavailable until state changes

@@ -10,7 +10,6 @@ class MyListener:
 
         if name_filter in name:
             print("%s - Service %s removed" % (datetime.now(), name))
-            print(zeroconf.get_service_info(type, name))
 
     def add_service(self, zeroconf, type, name):
 

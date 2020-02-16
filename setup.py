@@ -54,6 +54,6 @@ setup(
     tests_require=test_requirements,
     url='https://github.com/mattsaxon/pysonofflanr3',
     project_urls=PROJECT_URLS,
-    version="1.1.2",
+    version="1.1.3",
     zip_safe=False,
 )

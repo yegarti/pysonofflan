@@ -52,7 +52,7 @@ setup(
     setup_requires=setup_requirements,
     test_suite='tests',
     tests_require=test_requirements,
-    url='https://github.com/mattsaxon/pysonofflanr3',
+    url='https://github.com/mattsaxon/pysonofflan',
     project_urls=PROJECT_URLS,
     version='1.1.3',
     zip_safe=False,

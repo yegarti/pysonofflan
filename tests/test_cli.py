@@ -200,7 +200,7 @@ class TestCLI(unittest.TestCase):
 
         print(result.output)
 
-        assert "encoding without a string argument" in result.output
+        assert "Missing api_key for encrypted device" in result.output
 
     def test_cli_wrong_key(self):
 

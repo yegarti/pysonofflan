@@ -240,11 +240,17 @@ class SonoffLANModeClient:
                         data1 += data4
 
             if info.properties.get(b"encrypt"):
-                self.encrypted = True
-                # decrypt the message
-                iv = info.properties.get(b"iv")
-                data = sonoffcrypto.decrypt(data1, iv, self.api_key)
-                self.logger.debug("decrypted data: %s", data)
+
+                if self.api_key == "" or self.api_key is None:
+                    self.logger.error("Missing api_key for encrypted device: %s", name)
+                    data = None
+
+                else:
+                    self.encrypted = True
+                    # decrypt the message
+                    iv = info.properties.get(b"iv")
+                    data = sonoffcrypto.decrypt(data1, iv, self.api_key)
+                    self.logger.debug("decrypted data: %s", data)
 
             else:
                 self.encrypted = False

@@ -295,9 +295,10 @@ class SonoffDevice(object):
 
     async def handle_message(self, message):
 
-        # Null message shuts us down
+        # Null message shuts us down if we are CLI
         if message is None:
-            self.shutdown_event_loop()
+            if self.new_loop:
+                self.shutdown_event_loop()
             return
 
         # Empty message sends update

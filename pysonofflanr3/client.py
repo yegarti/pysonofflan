@@ -7,6 +7,8 @@ import traceback
 import collections
 import requests
 from zeroconf import ServiceBrowser, Zeroconf
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from pysonofflanr3 import sonoffcrypto
 import socket
@@ -35,6 +37,43 @@ class SonoffLANModeClient:
 
     # only a single zeroconf instance for all instances of this class
     zeroconf = Zeroconf()
+
+    def create_http_session(self):
+
+        # create an http session so we can use http keep-alives
+        self.http_session = requests.Session()
+
+        # add the http headers
+        # note the commented out ones are copies from the sniffed ones
+        headers = collections.OrderedDict(
+            {
+                "Content-Type": "application/json;charset=UTF-8",
+                # "Connection": "keep-alive",
+                "Accept": "application/json",
+                "Accept-Language": "en-gb",
+                # "Content-Length": "0",
+                # "Accept-Encoding": "gzip, deflate",
+                # "Cache-Control": "no-store",
+            }
+        )
+
+        # needed to keep headers in same order
+        # instead of self.http_session.headers.update(headers)
+        self.http_session.headers = headers
+
+    def set_retries(self, retry_count):
+
+        # no retries at moment, control in sonoffdevice
+        retries = Retry(
+            total=retry_count,
+            backoff_factor=0.5,
+            method_whitelist=["POST"],
+            status_forcelist=None,
+        )
+
+        self.http_session.mount(
+            "http://", HTTPAdapter(max_retries=retries)
+        )
 
     def __init__(
         self,
@@ -153,6 +192,7 @@ class SonoffLANModeClient:
                 )
 
                 self.create_http_session()
+                self.set_retries(0)
 
                 # find socket for end-point
                 socket_text = found_ip + ":" + str(info.port)
@@ -254,43 +294,6 @@ class SonoffLANModeClient:
                 self.event_handler(None), self.loop
             )
 
-    def create_http_session(self):
-
-        # create an http session so we can use http keep-alives
-        self.http_session = requests.Session()
-
-        # add the http headers
-        headers = collections.OrderedDict(
-            {
-                "Content-Type": "application/json;charset=UTF-8",
-                # "Connection": "keep-alive",
-                "Accept": "application/json",
-                "Accept-Language": "en-gb",
-                # "Content-Length": "0",
-                # "Accept-Encoding": "gzip, deflate",
-                # "Cache-Control": "no-store",
-            }
-        )
-
-        # self.http_session.headers.update(headers)
-        # needed to keep headers in same order
-        self.http_session.headers = headers
-
-        # setup retries
-        from requests.adapters import HTTPAdapter
-        from urllib3.util.retry import Retry
-
-        # no retries at moment, control in sonoffdevice
-        retries = Retry(
-            total=0,
-            backoff_factor=0.5,
-            method_whitelist=["POST"],
-            status_forcelist=None,
-        )
-        self.http_session.mount(
-            "http://", HTTPAdapter(max_retries=retries)
-        )
-
     def retry_connection(self):
 
         while True:
@@ -298,6 +301,9 @@ class SonoffLANModeClient:
                 self.logger.debug(
                     "Sending retry message for %s" % self.device_id
                 )
+                
+                # in retry connection, we autoamtically retry 3 times
+                self.set_retries(3)
                 self.send_signal_strength()
                 self.logger.info(
                     "Service %s flagged for removal, but is still active!"
@@ -323,6 +329,10 @@ class SonoffLANModeClient:
                     traceback.format_exc(),
                 )
                 break
+
+            finally:
+                # set retires back to 0
+                self.set_retries(0)
 
     def send_switch(self, request: Union[str, Dict]):
 

@@ -263,7 +263,8 @@ class SonoffDevice(object):
                         format(ex),
                         traceback.format_exc(),
                     )
-                    break
+                    await asyncio.sleep(self.calculate_retry(retry_count))
+                    retry_count += 1
 
         except asyncio.CancelledError:
             self.logger.debug("send_updated_params_loop cancelled")

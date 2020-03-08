@@ -71,9 +71,7 @@ class SonoffLANModeClient:
             status_forcelist=None,
         )
 
-        self.http_session.mount(
-            "http://", HTTPAdapter(max_retries=retries)
-        )
+        self.http_session.mount("http://", HTTPAdapter(max_retries=retries))
 
     def __init__(
         self,
@@ -242,7 +240,9 @@ class SonoffLANModeClient:
             if info.properties.get(b"encrypt"):
 
                 if self.api_key == "" or self.api_key is None:
-                    self.logger.error("Missing api_key for encrypted device: %s", name)
+                    self.logger.error(
+                        "Missing api_key for encrypted device: %s", name
+                    )
                     data = None
 
                 else:
@@ -307,7 +307,7 @@ class SonoffLANModeClient:
                 self.logger.debug(
                     "Sending retry message for %s" % self.device_id
                 )
-                
+
                 # in retry connection, we autoamtically retry 3 times
                 self.set_retries(3)
                 self.send_signal_strength()

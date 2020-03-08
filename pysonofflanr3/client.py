@@ -152,45 +152,12 @@ class SonoffLANModeClient:
                     zeroconf, name, listener=self
                 )
 
-                # create an http session so we can use http keep-alives
-                self.http_session = requests.Session()
-
-                # add the http headers
-                headers = collections.OrderedDict(
-                    {
-                        "Content-Type": "application/json;charset=UTF-8",
-                        # "Connection": "keep-alive",
-                        "Accept": "application/json",
-                        "Accept-Language": "en-gb",
-                        # "Content-Length": "0",
-                        # "Accept-Encoding": "gzip, deflate",
-                        # "Cache-Control": "no-store",
-                    }
-                )
-
-                # self.http_session.headers.update(headers)
-                # needed to keep headers in same order
-                self.http_session.headers = headers
+                self.create_http_session()
 
                 # find socket for end-point
                 socket_text = found_ip + ":" + str(info.port)
                 self.logger.debug("service is at %s", socket_text)
                 self.url = "http://" + socket_text
-
-                # setup retries
-                from requests.adapters import HTTPAdapter
-                from urllib3.util.retry import Retry
-
-                # no retries at moment, control in sonoffdevice
-                retries = Retry(
-                    total=0,
-                    backoff_factor=0.5,
-                    method_whitelist=["POST"],
-                    status_forcelist=None,
-                )
-                self.http_session.mount(
-                    "http://", HTTPAdapter(max_retries=retries)
-                )
 
                 # process the initial message
                 self.update_service(zeroconf, type, name)
@@ -286,6 +253,43 @@ class SonoffLANModeClient:
             asyncio.run_coroutine_threadsafe(
                 self.event_handler(None), self.loop
             )
+
+    def create_http_session(self):
+
+        # create an http session so we can use http keep-alives
+        self.http_session = requests.Session()
+
+        # add the http headers
+        headers = collections.OrderedDict(
+            {
+                "Content-Type": "application/json;charset=UTF-8",
+                # "Connection": "keep-alive",
+                "Accept": "application/json",
+                "Accept-Language": "en-gb",
+                # "Content-Length": "0",
+                # "Accept-Encoding": "gzip, deflate",
+                # "Cache-Control": "no-store",
+            }
+        )
+
+        # self.http_session.headers.update(headers)
+        # needed to keep headers in same order
+        self.http_session.headers = headers
+
+        # setup retries
+        from requests.adapters import HTTPAdapter
+        from urllib3.util.retry import Retry
+
+        # no retries at moment, control in sonoffdevice
+        retries = Retry(
+            total=0,
+            backoff_factor=0.5,
+            method_whitelist=["POST"],
+            status_forcelist=None,
+        )
+        self.http_session.mount(
+            "http://", HTTPAdapter(max_retries=retries)
+        )
 
     def retry_connection(self):
 

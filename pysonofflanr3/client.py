@@ -202,8 +202,6 @@ class SonoffLANModeClient:
 
     def update_service(self, zeroconf, type, name):
 
-        data = None
-
         # This is needed for zeroconfg 0.24.1
         # onwards as updates come to the parent node
         if self.my_service_name != name:
@@ -245,6 +243,7 @@ class SonoffLANModeClient:
                     self.logger.error(
                         "Missing api_key for encrypted device: %s", name
                     )
+                    data = None
 
                 else:
                     self.encrypted = True
@@ -259,12 +258,22 @@ class SonoffLANModeClient:
 
             self.properties = info.properties
 
+            # process the events on an event loop
+            # this method is on a background thread called from zeroconf
+            asyncio.run_coroutine_threadsafe(
+                self.event_handler(data), self.loop
+            )
+
         except ValueError as ex:
             self.logger.error(
                 "Error updating service for device %s: %s"
                 " Probably wrong API key.",
                 self.device_id,
                 format(ex),
+            )
+
+            asyncio.run_coroutine_threadsafe(
+                self.event_handler(None), self.loop
             )
 
         except TypeError as ex:
@@ -275,6 +284,10 @@ class SonoffLANModeClient:
                 format(ex),
             )
 
+            asyncio.run_coroutine_threadsafe(
+                self.event_handler(None), self.loop
+            )
+
         except Exception as ex:
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
@@ -283,11 +296,8 @@ class SonoffLANModeClient:
                 traceback.format_exc(),
             )
 
-        finally:
-            # process the events on an event loop
-            # this method is on a background thread called from zeroconf
             asyncio.run_coroutine_threadsafe(
-                self.event_handler(data), self.loop
+                self.event_handler(None), self.loop
             )
 
     def retry_connection(self):

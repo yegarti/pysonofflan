@@ -30,6 +30,7 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli, ["hello"])
+        print(result.output)
         assert 'Error: No such command "hello"' in result.output
 
     def test_cli_help(self):

@@ -229,7 +229,7 @@ class TestCLI(unittest.TestCase):
                 "--device_id",
                 "ReconnectMock",
                 "-l",
-                "INFO",
+                "DEBUG",
                 "--wait",
                 "2",
                 "listen",
@@ -257,7 +257,7 @@ class TestCLI(unittest.TestCase):
                 "--device_id",
                 "ReconnectStripMock",
                 "-l",
-                "INFO",
+                "DEBUG",
                 "--wait",
                 "2",
                 "listen",
@@ -273,7 +273,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_disconnect(self):
 
-        start_device("DisconnectMock", "strip", None, None, None, "Disconnect")
+        start_device("DisconnectMock", "plug", None, None, None, "Disconnect")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -283,7 +283,7 @@ class TestCLI(unittest.TestCase):
                 "--device_id",
                 "DisconnectMock",
                 "-l",
-                "INFO",
+                "DEBUG",
                 "--wait",
                 "3",
                 "listen",

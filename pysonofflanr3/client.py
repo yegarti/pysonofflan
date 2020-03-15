@@ -18,7 +18,7 @@ class SonoffLANModeClient:
     """
     Implementation of the Sonoff LAN Mode Protocol R3
 
-    Uses protocol as was documented documented by Itead
+    Uses protocol as was documented by Itead
 
     This document has since been unpublished
     """
@@ -202,21 +202,24 @@ class SonoffLANModeClient:
 
     def update_service(self, zeroconf, type, name):
 
+        data = None
+        
         # This is needed for zeroconfg 0.24.1
         # onwards as updates come to the parent node
         if self.my_service_name != name:
             return
 
-        try:
-            info = zeroconf.get_service_info(type, name)
+        info = zeroconf.get_service_info(type, name)
 
-            # This is useful optimsation for 0.24.1 onwards
-            # as multiple updates that are the same are received
-            if info.properties == self._info_cache:
-                self.logger.debug("same update received for device: %s", name)
-                return
-            else:
-                self._info_cache = info.properties
+        # This is useful optimsation for 0.24.1 onwards
+        # as multiple updates that are the same are received
+        if info.properties == self._info_cache:
+            self.logger.debug("same update received for device: %s", name)
+            return
+        else:
+            self._info_cache = info.properties
+
+        try:
 
             self.logger.debug("properties: %s", info.properties)
 
@@ -258,22 +261,12 @@ class SonoffLANModeClient:
 
             self.properties = info.properties
 
-            # process the events on an event loop
-            # this method is on a background thread called from zeroconf
-            asyncio.run_coroutine_threadsafe(
-                self.event_handler(data), self.loop
-            )
-
         except ValueError as ex:
             self.logger.error(
                 "Error updating service for device %s: %s"
                 " Probably wrong API key.",
                 self.device_id,
                 format(ex),
-            )
-
-            asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop
             )
 
         except TypeError as ex:
@@ -284,10 +277,6 @@ class SonoffLANModeClient:
                 format(ex),
             )
 
-            asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop
-            )
-
         except Exception as ex:
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
@@ -296,8 +285,11 @@ class SonoffLANModeClient:
                 traceback.format_exc(),
             )
 
+        finally:
+            # process the events on an event loop
+            # this method is on a background thread called from zeroconf
             asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop
+                self.event_handler(data), self.loop
             )
 
     def retry_connection(self):
@@ -308,7 +300,7 @@ class SonoffLANModeClient:
                     "Sending retry message for %s" % self.device_id
                 )
 
-                # in retry connection, we autoamtically retry 3 times
+                # in retry connection, we automatically retry 3 times
                 self.set_retries(3)
                 self.send_signal_strength()
                 self.logger.info(

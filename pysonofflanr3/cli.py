@@ -169,6 +169,8 @@ def listen(config: dict):
 
     async def state_callback(self):
 
+        self.shared_state["callback_counter"] += 1
+        
         if self.basic_info is not None:
             print_device_details(self)
 
@@ -183,8 +185,6 @@ def listen(config: dict):
                         config["wait"]
                     ):
                         self.shutdown_event_loop()
-
-        self.shared_state["callback_counter"] += 1
 
     logger.info("Initialising SonoffSwitch with host %s" % config["host"])
 

@@ -149,17 +149,20 @@ class SonoffDevice(object):
                 self.client.disconnected_event.clear()
 
                 self.logger.info(
-                    "%s: Connected event, sending 'available' update",
+                    "%s: Connected event, waiting for disconnect",
                     self.client.device_id,
                 )
 
-                if self.callback_after_update is not None:
-                    await self.callback_after_update(self)
-
-                self.logger.debug("waiting for disconnection")
+                # Don't send update when we connect, handle_message() will
+                #if self.callback_after_update is not None:
+                #    await self.callback_after_update(self)
 
                 await self.client.disconnected_event.wait()
                 self.client.connected_event.clear()
+
+                # clear state so we know to send an update when connection returns
+                self.params = {"switch": "unknown"}
+                self.client._info_cache = None
 
                 self.logger.info(
                     "%s: Disconnected event, sending 'unavailable' update",
@@ -295,10 +298,17 @@ class SonoffDevice(object):
 
     async def handle_message(self, message):
 
-        # Null message shuts us down if we are CLI
+        self.logger.debug("enter handle_message() %s", message)
+
+        # Null message shuts us down if we are CLI or sends update if API
         if message is None:
             if self.new_loop:
                 self.shutdown_event_loop()
+            else:
+                self.logger.info(
+                    "1"
+                )
+                await self.callback_after_update(self)
             return
 
         # Empty message sends update
@@ -312,8 +322,6 @@ class SonoffDevice(object):
         """
 
         try:
-            self.logger.debug("enter handle_message() %s", message)
-
             self.message_ping_event.set()
 
             response = json.loads(message.decode("utf-8"))
@@ -349,6 +357,10 @@ class SonoffDevice(object):
             self.basic_info["deviceid"] = self.host
 
             self.client.connected_event.set()
+            self.logger.info(
+                    "%s: Connected event, sending 'available' update",
+                    self.client.device_id,
+            )
 
             send_update = False
 

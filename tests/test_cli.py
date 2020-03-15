@@ -58,13 +58,27 @@ class TestCLI(unittest.TestCase):
         result = runner.invoke(cli.cli, ["--host"])
         assert "Error: --host option requires an argument" in result.output
 
-    def test_cli_state(self):
+    def test_cli_state_error(self):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli, ["state"])
         assert (
             "No host name or device_id given, see usage below" in result.output
         )
+
+    def test_cli_state(self):
+
+        start_device("StateMock", "plug")
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(cli.cli, ["--device_id", "StateMock", "state"])
+
+        print(result.output)
+
+        assert "info: State: OFF" in result.output
+
+        stop_device()
 
     def test_cli_on(self):
 

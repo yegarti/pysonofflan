@@ -8,9 +8,9 @@ from click_log import ClickHandler
 
 from pysonofflanr3 import SonoffSwitch, Discover
 
-if sys.version_info < (3, 5):
+if sys.version_info < (3, 6): # pragma: no cover
     print(
-        "To use this script you need python 3.5 or newer! got %s"
+        "To use this script you need python 3.6 or newer! got %s"
         % sys.version_info
     )
     sys.exit(1)
@@ -174,7 +174,7 @@ def listen(config: dict):
         if self.basic_info is not None:
             print_device_details(self)
 
-            if self.shared_state["callback_counter"] == 0:
+            if self.shared_state["callback_counter"] == 0: # pragma: no cover
                 logger.info(
                     "Listening for updates forever...' \
                 'Press CTRL+C to quit."

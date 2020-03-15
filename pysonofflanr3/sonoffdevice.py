@@ -46,7 +46,7 @@ class SonoffDevice(object):
         self.tasks = []
         self.new_loop = False
 
-        if logger is None:
+        if logger is None: # pragma: no cover
             self.logger = logging.getLogger(__name__)
         else:
             self.logger = logger
@@ -258,7 +258,7 @@ class SonoffDevice(object):
                     await asyncio.sleep(self.calculate_retry(retry_count))
                     retry_count += 1
 
-                except Exception as ex:
+                except Exception as ex: # pragma: no cover
                     self.logger.error(
                         "send_updated_params_loop() [inner block] "
                         "Unexpected error for device %s: %s %s",
@@ -272,7 +272,7 @@ class SonoffDevice(object):
         except asyncio.CancelledError:
             self.logger.debug("send_updated_params_loop cancelled")
 
-        except Exception as ex:
+        except Exception as ex: # pragma: no cover
             self.logger.error(
                 "send_updated_params_loop() [outer block] "
                 "Unexpected error for device %s: %s %s",
@@ -397,7 +397,7 @@ class SonoffDevice(object):
             if send_update and self.callback_after_update is not None:
                 await self.callback_after_update(self)
 
-        except Exception as ex:
+        except Exception as ex: # pragma: no cover
             self.logger.error(
                 "Unexpected error in handle_message() for device %s: %s %s",
                 self.device_id,
@@ -439,23 +439,10 @@ class SonoffDevice(object):
                 ):
                     self.loop.run_forever()
 
-        except Exception as ex:
+        except Exception as ex: # pragma: no cover
             self.logger.error(
                 "Unexpected error in shutdown_event_loop(): %s", format(ex)
             )
-
-        finally:
-            if self.new_loop:
-
-                if (
-                    hasattr(self.loop, "shutdown_asyncgens")
-                    and not self.loop.is_running()
-                ):
-                    # Python 3.5
-                    self.loop.run_until_complete(
-                        self.loop.shutdown_asyncgens()
-                    )
-                    self.loop.close()
 
     @property
     def device_id(self) -> str:
@@ -487,7 +474,7 @@ class SonoffDevice(object):
         """
         Turns the device on.
         """
-        raise NotImplementedError("Device subclass needs to implement this.")
+        raise NotImplementedError("Device subclass needs to implement this.") # pragma: no cover
 
     @property
     def is_on(self) -> bool:
@@ -498,7 +485,7 @@ class SonoffDevice(object):
         :rtype: bool
         :return:
         """
-        raise NotImplementedError("Device subclass needs to implement this.")
+        raise NotImplementedError("Device subclass needs to implement this.") # pragma: no cover
 
     def __repr__(self):
         return "<%s at %s>" % (self.__class__.__name__, self.device_id)

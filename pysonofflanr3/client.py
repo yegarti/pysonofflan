@@ -11,6 +11,7 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from pysonofflanr3 import sonoffcrypto
+from pysonofflanr3 import utils
 import socket
 
 
@@ -114,7 +115,7 @@ class SonoffLANModeClient:
         if self.my_service_name is None:
 
             info = zeroconf.get_service_info(type, name)
-            found_ip = self.parseAddress(info.address)
+            found_ip = utils.parseAddress(info.address)
 
             if self.device_id is not None:
 
@@ -418,23 +419,3 @@ class SonoffLANModeClient:
         )
 
         self.http_session.mount("http://", HTTPAdapter(max_retries=retries))
-
-    def parseAddress(self, address):
-        """
-        Resolve the IP address of the device
-        :param address:
-        :return: add_str
-        """
-        add_list = []
-        for i in range(4):
-            add_list.append(int(address.hex()[(i * 2): (i + 1) * 2], 16))
-        add_str = (
-            str(add_list[0])
-            + "."
-            + str(add_list[1])
-            + "."
-            + str(add_list[2])
-            + "."
-            + str(add_list[3])
-        )
-        return add_str

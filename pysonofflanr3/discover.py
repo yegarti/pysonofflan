@@ -2,7 +2,7 @@ import time
 from typing import Dict
 from datetime import datetime
 from zeroconf import ServiceBrowser, Zeroconf
-
+from pysonofflanr3 import utils
 
 class Discover:
     @staticmethod
@@ -36,30 +36,10 @@ class MyListener:
         info = zeroconf.get_service_info(type, name)
         self.logger.debug(info)
         device = info.properties[b"id"].decode("ascii")
-        ip = self.parseAddress(info.address) + ":" + str(info.port)
+        ip = utils.parseAddress(info.address) + ":" + str(info.port)
 
         self.logger.info(
             "Found Sonoff LAN Mode device %s at socket %s" % (device, ip)
         )
 
         self.devices[device] = ip
-
-    def parseAddress(self, address):
-        """
-        Resolve the IP address of the device
-        :param address:
-        :return: add_str
-        """
-        add_list = []
-        for i in range(4):
-            add_list.append(int(address.hex()[(i * 2): (i + 1) * 2], 16))
-        add_str = (
-            str(add_list[0])
-            + "."
-            + str(add_list[1])
-            + "."
-            + str(add_list[2])
-            + "."
-            + str(add_list[3])
-        )
-        return add_str

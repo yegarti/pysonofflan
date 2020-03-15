@@ -7,11 +7,9 @@ import json
 import logging
 import sys
 from typing import Callable, Awaitable, Dict
-
 import traceback
-
 from pysonofflanr3 import SonoffLANModeClient
-
+from pysonofflanr3 import utils
 
 class SonoffDevice(object):
     def __init__(
@@ -119,23 +117,6 @@ class SonoffDevice(object):
         except asyncio.CancelledError:
             self.logger.debug("SonoffDevice loop ended, returning")
 
-    def calculate_retry(self, retry_count):
-
-        try:
-
-            # increasing backoff each retry attempt
-            wait_seconds = [2, 5, 10, 30, 60]
-
-            if retry_count >= len(wait_seconds):
-                retry_count = len(wait_seconds) - 1
-
-            return wait_seconds[retry_count]
-
-        except Exception as ex:
-            self.logger.error(
-                "Unexpected error in wait_before_retry(): %s", format(ex)
-            )
-
     async def send_availability_loop(self):
 
         self.logger.debug("enter send_availability_loop()")
@@ -213,7 +194,7 @@ class SonoffDevice(object):
 
                     await asyncio.wait_for(
                         self.message_ping_event.wait(),
-                        self.calculate_retry(retry_count),
+                        utils.calculate_retry(retry_count),
                     )
 
                     if self.message_acknowledged_event.is_set():
@@ -255,7 +236,7 @@ class SonoffDevice(object):
                             format(ex),
                         )
 
-                    await asyncio.sleep(self.calculate_retry(retry_count))
+                    await asyncio.sleep(utils.calculate_retry(retry_count))
                     retry_count += 1
 
                 except Exception as ex:  # pragma: no cover
@@ -266,7 +247,7 @@ class SonoffDevice(object):
                         format(ex),
                         traceback.format_exc(),
                     )
-                    await asyncio.sleep(self.calculate_retry(retry_count))
+                    await asyncio.sleep(utils.calculate_retry(retry_count))
                     retry_count += 1
 
         except asyncio.CancelledError:

@@ -17,3 +17,13 @@ def parseAddress(address):
         + str(add_list[3])
     )
     return add_str
+
+def calculate_retry(retry_count):
+
+    # increasing backoff each retry attempt
+    wait_seconds = [2, 5, 10, 30, 60]
+
+    if retry_count >= len(wait_seconds):
+        retry_count = len(wait_seconds) - 1
+
+    return wait_seconds[retry_count]

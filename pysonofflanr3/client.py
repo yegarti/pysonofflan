@@ -165,7 +165,7 @@ class SonoffLANModeClient:
     def update_service(self, zeroconf, type, name):
 
         data = None
-        
+
         # This is needed for zeroconfg 0.24.1
         # onwards as updates come to the parent node
         if self.my_service_name != name:
@@ -231,7 +231,7 @@ class SonoffLANModeClient:
                 format(ex),
             )
 
-        except Exception as ex: # pragma: no cover
+        except Exception as ex:  # pragma: no cover
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
                 self.device_id,
@@ -273,7 +273,7 @@ class SonoffLANModeClient:
                 self.close_connection()
                 break
 
-            except Exception as ex: # pragma: no cover
+            except Exception as ex:  # pragma: no cover
                 self.logger.error(
                     "Retry_connection() Unexpected error for device %s: %s %s",
                     self.device_id,
@@ -310,7 +310,7 @@ class SonoffLANModeClient:
 
             return response
 
-        except Exception as ex: # pragma: no cover
+        except Exception as ex:  # pragma: no cover
             self.logger.error(
                 "error %s processing response: %s, %s",
                 format(ex),
@@ -374,9 +374,7 @@ class SonoffLANModeClient:
 
             self.logger.debug("params: %s", params)
 
-            sonoffcrypto.format_encryption_msg(
-                payload, self.api_key, params
-            )
+            sonoffcrypto.format_encryption_msg(payload, self.api_key, params)
             self.logger.debug("encrypted: %s", payload)
 
         else:

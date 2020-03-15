@@ -49,7 +49,7 @@ class SonoffSwitch(SonoffDevice):
         self.inching_seconds = inching_seconds
         self.parent_callback_after_update = callback_after_update
 
-        if logger is None: # pragma: no cover
+        if logger is None:  # pragma: no cover
             self.logger = logging.getLogger(__name__)
         else:
             self.logger = logger

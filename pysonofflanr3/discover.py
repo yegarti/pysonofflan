@@ -1,4 +1,3 @@
-import logging
 import time
 from typing import Dict
 from datetime import datetime
@@ -24,6 +23,7 @@ class Discover:
         zeroconf.close()
 
         return listener.devices
+
 
 class MyListener:
     def __init__(self):

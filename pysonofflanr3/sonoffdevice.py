@@ -46,7 +46,7 @@ class SonoffDevice(object):
         self.tasks = []
         self.new_loop = False
 
-        if logger is None: # pragma: no cover
+        if logger is None:  # pragma: no cover
             self.logger = logging.getLogger(__name__)
         else:
             self.logger = logger
@@ -154,13 +154,13 @@ class SonoffDevice(object):
                 )
 
                 # Don't send update when we connect, handle_message() will
-                #if self.callback_after_update is not None:
+                # if self.callback_after_update is not None:
                 #    await self.callback_after_update(self)
 
                 await self.client.disconnected_event.wait()
                 self.client.connected_event.clear()
 
-                # clear state so we know to send an update when connection returns
+                # clear state so we know to send update when connection returns
                 self.params = {"switch": "unknown"}
                 self.client._info_cache = None
 
@@ -258,7 +258,7 @@ class SonoffDevice(object):
                     await asyncio.sleep(self.calculate_retry(retry_count))
                     retry_count += 1
 
-                except Exception as ex: # pragma: no cover
+                except Exception as ex:  # pragma: no cover
                     self.logger.error(
                         "send_updated_params_loop() [inner block] "
                         "Unexpected error for device %s: %s %s",
@@ -272,7 +272,7 @@ class SonoffDevice(object):
         except asyncio.CancelledError:
             self.logger.debug("send_updated_params_loop cancelled")
 
-        except Exception as ex: # pragma: no cover
+        except Exception as ex:  # pragma: no cover
             self.logger.error(
                 "send_updated_params_loop() [outer block] "
                 "Unexpected error for device %s: %s %s",
@@ -355,8 +355,8 @@ class SonoffDevice(object):
 
             self.client.connected_event.set()
             self.logger.info(
-                    "%s: Connected event, sending 'available' update",
-                    self.client.device_id,
+                "%s: Connected event, sending 'available' update",
+                self.client.device_id,
             )
 
             send_update = False
@@ -397,7 +397,7 @@ class SonoffDevice(object):
             if send_update and self.callback_after_update is not None:
                 await self.callback_after_update(self)
 
-        except Exception as ex: # pragma: no cover
+        except Exception as ex:  # pragma: no cover
             self.logger.error(
                 "Unexpected error in handle_message() for device %s: %s %s",
                 self.device_id,
@@ -439,7 +439,7 @@ class SonoffDevice(object):
                 ):
                     self.loop.run_forever()
 
-        except Exception as ex: # pragma: no cover
+        except Exception as ex:  # pragma: no cover
             self.logger.error(
                 "Unexpected error in shutdown_event_loop(): %s", format(ex)
             )
@@ -474,7 +474,9 @@ class SonoffDevice(object):
         """
         Turns the device on.
         """
-        raise NotImplementedError("Device subclass needs to implement this.") # pragma: no cover
+        raise NotImplementedError(
+            "Device subclass needs to implement this."
+        )  # pragma: no cover
 
     @property
     def is_on(self) -> bool:
@@ -485,7 +487,9 @@ class SonoffDevice(object):
         :rtype: bool
         :return:
         """
-        raise NotImplementedError("Device subclass needs to implement this.") # pragma: no cover
+        raise NotImplementedError(
+            "Device subclass needs to implement this."
+        )  # pragma: no cover
 
     def __repr__(self):
         return "<%s at %s>" % (self.__class__.__name__, self.device_id)

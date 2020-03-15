@@ -31,12 +31,9 @@ def format_encryption_msg(payload, api_key, data):
     payload["iv"] = b64encode(iv).decode("utf-8")
     payload["encrypt"] = True
 
-    if data is None:
-        payload["data"] = ""
-    else:
-        payload["data"] = encrypt(
-            json.dumps(data, separators=(",", ":")), iv, api_key
-        )
+    payload["data"] = encrypt(
+        json.dumps(data, separators=(",", ":")), iv, api_key
+    )
 
 
 def format_encryption_txt(properties, data, api_key):

@@ -70,9 +70,6 @@ class SonoffLANModeClient:
         self._last_params = {"switch": "off"}
         self._times_added = 0
 
-        if self.logger is None:
-            self.logger = logging.getLogger(__name__)
-
     def listen(self):
         """
         Setup a mDNS listener
@@ -234,15 +231,7 @@ class SonoffLANModeClient:
                 format(ex),
             )
 
-        except TypeError as ex:
-            self.logger.error(
-                "Error updating service for device %s: %s"
-                " Probably missing API key.",
-                self.device_id,
-                format(ex),
-            )
-
-        except Exception as ex:
+        except Exception as ex: # pragma: no cover
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
                 self.device_id,
@@ -284,7 +273,7 @@ class SonoffLANModeClient:
                 self.close_connection()
                 break
 
-            except Exception as ex:
+            except Exception as ex: # pragma: no cover
                 self.logger.error(
                     "Retry_connection() Unexpected error for device %s: %s %s",
                     self.device_id,
@@ -321,7 +310,7 @@ class SonoffLANModeClient:
 
             return response
 
-        except Exception as ex:
+        except Exception as ex: # pragma: no cover
             self.logger.error(
                 "error %s processing response: %s, %s",
                 format(ex),
@@ -385,16 +374,10 @@ class SonoffLANModeClient:
 
             self.logger.debug("params: %s", params)
 
-            if self.api_key != "" and self.api_key is not None:
-                sonoffcrypto.format_encryption_msg(
-                    payload, self.api_key, params
-                )
-                self.logger.debug("encrypted: %s", payload)
-
-            else:
-                self.logger.error(
-                    "missing api_key field for device: %s", self.device_id
-                )
+            sonoffcrypto.format_encryption_msg(
+                payload, self.api_key, params
+            )
+            self.logger.debug("encrypted: %s", payload)
 
         else:
             payload["encrypt"] = False

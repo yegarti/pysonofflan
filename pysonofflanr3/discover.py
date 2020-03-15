@@ -7,15 +7,11 @@ from zeroconf import ServiceBrowser, Zeroconf
 
 class Discover:
     @staticmethod
-    async def discover(logger=None, seconds_to_wait=None) -> Dict[str, str]:
+    async def discover(logger, seconds_to_wait=5) -> Dict[str, str]:
         """
         :rtype: dict
         :return: Array of devices {"device_id", "ip:port"}
         """
-        if logger is None:
-            print("new logger!")
-            logger = logging.getLogger(__name__)
-
         logger.debug("Looking for all eWeLink devices on local network.")
 
         zeroconf = Zeroconf()
@@ -23,25 +19,16 @@ class Discover:
         listener.logger = logger
         ServiceBrowser(zeroconf, "_ewelink._tcp.local.", listener)
 
-        if seconds_to_wait is None:
-            time.sleep(4)
-
-        else:
-            time.sleep(seconds_to_wait)
+        time.sleep(seconds_to_wait)
 
         zeroconf.close()
 
         return listener.devices
 
-
 class MyListener:
     def __init__(self):
 
         self.devices = {}
-
-    def remove_service(self, zeroconf, type, name):
-
-        print("%s - Service %s removed" % (datetime.now(), name))
 
     def add_service(self, zeroconf, type, name):
 

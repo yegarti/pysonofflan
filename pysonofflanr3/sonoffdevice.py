@@ -101,7 +101,7 @@ class SonoffDevice(object):
             self.message_acknowledged_event = asyncio.Event()
             self.params_updated_event = asyncio.Event()
 
-            self.client.connect()
+            self.client.listen()
 
             self.tasks.append(
                 self.loop.create_task(self.send_availability_loop())
@@ -305,9 +305,6 @@ class SonoffDevice(object):
             if self.new_loop:
                 self.shutdown_event_loop()
             else:
-                self.logger.info(
-                    "1"
-                )
                 await self.callback_after_update(self)
             return
 

@@ -38,41 +38,6 @@ class SonoffLANModeClient:
     # only a single zeroconf instance for all instances of this class
     zeroconf = Zeroconf()
 
-    def create_http_session(self):
-
-        # create an http session so we can use http keep-alives
-        self.http_session = requests.Session()
-
-        # add the http headers
-        # note the commented out ones are copies from the sniffed ones
-        headers = collections.OrderedDict(
-            {
-                "Content-Type": "application/json;charset=UTF-8",
-                # "Connection": "keep-alive",
-                "Accept": "application/json",
-                "Accept-Language": "en-gb",
-                # "Content-Length": "0",
-                # "Accept-Encoding": "gzip, deflate",
-                # "Cache-Control": "no-store",
-            }
-        )
-
-        # needed to keep headers in same order
-        # instead of self.http_session.headers.update(headers)
-        self.http_session.headers = headers
-
-    def set_retries(self, retry_count):
-
-        # no retries at moment, control in sonoffdevice
-        retries = Retry(
-            total=retry_count,
-            backoff_factor=0.5,
-            method_whitelist=["POST"],
-            status_forcelist=None,
-        )
-
-        self.http_session.mount("http://", HTTPAdapter(max_retries=retries))
-
     def __init__(
         self,
         host: str,
@@ -108,7 +73,7 @@ class SonoffLANModeClient:
         if self.logger is None:
             self.logger = logging.getLogger(__name__)
 
-    def connect(self):
+    def listen(self):
         """
         Setup a mDNS listener
         """
@@ -437,6 +402,41 @@ class SonoffLANModeClient:
             self.logger.debug("message to send (plaintext): %s", payload)
 
         return payload
+
+    def create_http_session(self):
+
+        # create an http session so we can use http keep-alives
+        self.http_session = requests.Session()
+
+        # add the http headers
+        # note the commented out ones are copies from the sniffed ones
+        headers = collections.OrderedDict(
+            {
+                "Content-Type": "application/json;charset=UTF-8",
+                # "Connection": "keep-alive",
+                "Accept": "application/json",
+                "Accept-Language": "en-gb",
+                # "Content-Length": "0",
+                # "Accept-Encoding": "gzip, deflate",
+                # "Cache-Control": "no-store",
+            }
+        )
+
+        # needed to keep headers in same order
+        # instead of self.http_session.headers.update(headers)
+        self.http_session.headers = headers
+
+    def set_retries(self, retry_count):
+
+        # no retries at moment, control in sonoffdevice
+        retries = Retry(
+            total=retry_count,
+            backoff_factor=0.5,
+            method_whitelist=["POST"],
+            status_forcelist=None,
+        )
+
+        self.http_session.mount("http://", HTTPAdapter(max_retries=retries))
 
     def parseAddress(self, address):
         """

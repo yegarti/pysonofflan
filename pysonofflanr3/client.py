@@ -146,19 +146,8 @@ class SonoffLANModeClient:
                     "Service type %s of name %s added", type, name
                 )
 
-                # listen for updates to the specific device
-                # (needed for zerconf 0.23.0, 0.24.0, fixed in later versions)
-                self.service_browser = ServiceBrowser(
-                    zeroconf, name, listener=self
-                )
-
                 self.create_http_session()
                 self.set_retries(0)
-
-                # find socket for end-point
-                socket_text = found_ip + ":" + str(info.port)
-                self.logger.debug("service is at %s", socket_text)
-                self.url = "http://" + socket_text
 
                 # process the initial message
                 self.update_service(zeroconf, type, name)
@@ -167,17 +156,19 @@ class SonoffLANModeClient:
 
         data = None
 
-        # This is needed for zeroconfg 0.24.1
+        # This is needed for zeroconf 0.24.1
         # onwards as updates come to the parent node
         if self.my_service_name != name:
             return
 
-        info = zeroconf.get_service_info(type, name)
+        info = zeroconf.get_service_info(type, name) 
+        found_ip = utils.parseAddress(info.address)
+        self.set_url(found_ip, str(info.port))
 
-        # This is useful optimsation for 0.24.1 onwards
+        # Useful optimsation for 0.24.1 onwards (fixed in 0.24.5 though)
         # as multiple updates that are the same are received
         if info.properties == self._info_cache:
-            self.logger.debug("same update received for device: %s", name)
+            self.logger.info("same update received for device: %s", name)
             return
         else:
             self._info_cache = info.properties
@@ -384,6 +375,12 @@ class SonoffLANModeClient:
             self.logger.debug("message to send (plaintext): %s", payload)
 
         return payload
+
+    def set_url(self, ip, port):
+
+        socket_text = ip + ":" + port
+        self.url = "http://" + socket_text
+        self.logger.debug("service is at %s", self.url)
 
     def create_http_session(self):
 

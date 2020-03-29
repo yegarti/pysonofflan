@@ -161,7 +161,7 @@ class SonoffLANModeClient:
         if self.my_service_name != name:
             return
 
-        info = zeroconf.get_service_info(type, name) 
+        info = zeroconf.get_service_info(type, name)
         found_ip = utils.parseAddress(info.address)
         self.set_url(found_ip, str(info.port))
 

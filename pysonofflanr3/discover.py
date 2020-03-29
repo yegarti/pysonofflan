@@ -4,6 +4,7 @@ from datetime import datetime
 from zeroconf import ServiceBrowser, Zeroconf
 from pysonofflanr3 import utils
 
+
 class Discover:
     @staticmethod
     async def discover(logger, seconds_to_wait=5) -> Dict[str, str]:

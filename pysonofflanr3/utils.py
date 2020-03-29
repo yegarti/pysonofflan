@@ -18,6 +18,7 @@ def parseAddress(address):
     )
     return add_str
 
+
 def calculate_retry(retry_count):
 
     # increasing backoff each retry attempt

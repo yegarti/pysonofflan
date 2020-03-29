@@ -11,6 +11,7 @@ import traceback
 from pysonofflanr3 import SonoffLANModeClient
 from pysonofflanr3 import utils
 
+
 class SonoffDevice(object):
     def __init__(
         self,

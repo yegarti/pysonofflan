@@ -30,7 +30,8 @@ class TestCLI(unittest.TestCase):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli, ["hello"])
-        assert 'Error: No such command "hello"' in result.output
+        print(result.output)
+        assert 'Error: No such command' in result.output
 
     def test_cli_help(self):
         runner = CliRunner()
@@ -58,13 +59,27 @@ class TestCLI(unittest.TestCase):
         result = runner.invoke(cli.cli, ["--host"])
         assert "Error: --host option requires an argument" in result.output
 
-    def test_cli_state(self):
+    def test_cli_state_error(self):
         """Test the CLI."""
         runner = CliRunner()
         result = runner.invoke(cli.cli, ["state"])
         assert (
             "No host name or device_id given, see usage below" in result.output
         )
+
+    def test_cli_state(self):
+
+        start_device("StateMock", "plug")
+
+        """Test the CLI."""
+        runner = CliRunner()
+        result = runner.invoke(cli.cli, ["--device_id", "StateMock", "state"])
+
+        print(result.output)
+
+        assert "info: State: OFF" in result.output
+
+        stop_device()
 
     def test_cli_on(self):
 
@@ -200,7 +215,7 @@ class TestCLI(unittest.TestCase):
 
         print(result.output)
 
-        assert "encoding without a string argument" in result.output
+        assert "Missing api_key for encrypted device" in result.output
 
     def test_cli_wrong_key(self):
 
@@ -229,7 +244,7 @@ class TestCLI(unittest.TestCase):
                 "--device_id",
                 "ReconnectMock",
                 "-l",
-                "INFO",
+                "DEBUG",
                 "--wait",
                 "2",
                 "listen",
@@ -257,7 +272,7 @@ class TestCLI(unittest.TestCase):
                 "--device_id",
                 "ReconnectStripMock",
                 "-l",
-                "INFO",
+                "DEBUG",
                 "--wait",
                 "2",
                 "listen",
@@ -273,7 +288,7 @@ class TestCLI(unittest.TestCase):
 
     def test_cli_disconnect(self):
 
-        start_device("DisconnectMock", "strip", None, None, None, "Disconnect")
+        start_device("DisconnectMock", "plug", None, None, None, "Disconnect")
 
         """Test the CLI."""
         runner = CliRunner()
@@ -283,7 +298,7 @@ class TestCLI(unittest.TestCase):
                 "--device_id",
                 "DisconnectMock",
                 "-l",
-                "INFO",
+                "DEBUG",
                 "--wait",
                 "3",
                 "listen",

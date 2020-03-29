@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=7.0', 'click_log', 'pycryptodome', 'requests', 'zeroconf>=0.24.4']
+requirements = ['Click>=7.0', 'click_log', 'pycryptodome', 'requests', 'zeroconf>=0.24.5']
 setup_requirements = []
 test_requirements = ['pytest', 'tox', 'python-coveralls', 'flask', 'flake8']
 
@@ -54,6 +54,6 @@ setup(
     tests_require=test_requirements,
     url='https://github.com/mattsaxon/pysonofflan',
     project_urls=PROJECT_URLS,
-    version='1.1.3',
+    version='1.1.4',
     zip_safe=False,
 )

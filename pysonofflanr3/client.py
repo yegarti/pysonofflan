@@ -7,8 +7,11 @@ import traceback
 import collections
 import requests
 from zeroconf import ServiceBrowser, Zeroconf
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from pysonofflanr3 import sonoffcrypto
+from pysonofflanr3 import utils
 import socket
 
 
@@ -16,7 +19,7 @@ class SonoffLANModeClient:
     """
     Implementation of the Sonoff LAN Mode Protocol R3
 
-    Uses protocol as was documented documented by Itead
+    Uses protocol as was documented by Itead
 
     This document has since been unpublished
     """
@@ -68,10 +71,7 @@ class SonoffLANModeClient:
         self._last_params = {"switch": "off"}
         self._times_added = 0
 
-        if self.logger is None:
-            self.logger = logging.getLogger(__name__)
-
-    def connect(self):
+    def listen(self):
         """
         Setup a mDNS listener
         """
@@ -115,7 +115,7 @@ class SonoffLANModeClient:
         if self.my_service_name is None:
 
             info = zeroconf.get_service_info(type, name)
-            found_ip = self.parseAddress(info.address)
+            found_ip = utils.parseAddress(info.address)
 
             if self.device_id is not None:
 
@@ -146,72 +146,34 @@ class SonoffLANModeClient:
                     "Service type %s of name %s added", type, name
                 )
 
-                # listen for updates to the specific device
-                # (needed for zerconf 0.23.0, 0.24.0, fixed in later versions)
-                self.service_browser = ServiceBrowser(
-                    zeroconf, name, listener=self
-                )
-
-                # create an http session so we can use http keep-alives
-                self.http_session = requests.Session()
-
-                # add the http headers
-                headers = collections.OrderedDict(
-                    {
-                        "Content-Type": "application/json;charset=UTF-8",
-                        # "Connection": "keep-alive",
-                        "Accept": "application/json",
-                        "Accept-Language": "en-gb",
-                        # "Content-Length": "0",
-                        # "Accept-Encoding": "gzip, deflate",
-                        # "Cache-Control": "no-store",
-                    }
-                )
-
-                # self.http_session.headers.update(headers)
-                # needed to keep headers in same order
-                self.http_session.headers = headers
-
-                # find socket for end-point
-                socket_text = found_ip + ":" + str(info.port)
-                self.logger.debug("service is at %s", socket_text)
-                self.url = "http://" + socket_text
-
-                # setup retries
-                from requests.adapters import HTTPAdapter
-                from urllib3.util.retry import Retry
-
-                # no retries at moment, control in sonoffdevice
-                retries = Retry(
-                    total=0,
-                    backoff_factor=0.5,
-                    method_whitelist=["POST"],
-                    status_forcelist=None,
-                )
-                self.http_session.mount(
-                    "http://", HTTPAdapter(max_retries=retries)
-                )
+                self.create_http_session()
+                self.set_retries(0)
 
                 # process the initial message
                 self.update_service(zeroconf, type, name)
 
     def update_service(self, zeroconf, type, name):
 
-        # This is needed for zeroconfg 0.24.1
+        data = None
+
+        # This is needed for zeroconf 0.24.1
         # onwards as updates come to the parent node
         if self.my_service_name != name:
             return
 
-        try:
-            info = zeroconf.get_service_info(type, name)
+        info = zeroconf.get_service_info(type, name)
+        found_ip = utils.parseAddress(info.address)
+        self.set_url(found_ip, str(info.port))
 
-            # This is useful optimsation for 0.24.1 onwards
-            # as multiple updates that are the same are received
-            if info.properties == self._info_cache:
-                self.logger.debug("same update received for device: %s", name)
-                return
-            else:
-                self._info_cache = info.properties
+        # Useful optimsation for 0.24.1 onwards (fixed in 0.24.5 though)
+        # as multiple updates that are the same are received
+        if info.properties == self._info_cache:
+            self.logger.info("same update received for device: %s", name)
+            return
+        else:
+            self._info_cache = info.properties
+
+        try:
 
             self.logger.debug("properties: %s", info.properties)
 
@@ -233,23 +195,25 @@ class SonoffLANModeClient:
                         data1 += data4
 
             if info.properties.get(b"encrypt"):
-                self.encrypted = True
-                # decrypt the message
-                iv = info.properties.get(b"iv")
-                data = sonoffcrypto.decrypt(data1, iv, self.api_key)
-                self.logger.debug("decrypted data: %s", data)
+
+                if self.api_key == "" or self.api_key is None:
+                    self.logger.error(
+                        "Missing api_key for encrypted device: %s", name
+                    )
+                    data = None
+
+                else:
+                    self.encrypted = True
+                    # decrypt the message
+                    iv = info.properties.get(b"iv")
+                    data = sonoffcrypto.decrypt(data1, iv, self.api_key)
+                    self.logger.debug("decrypted data: %s", data)
 
             else:
                 self.encrypted = False
                 data = data1
 
             self.properties = info.properties
-
-            # process the events on an event loop
-            # this method is on a background thread called from zeroconf
-            asyncio.run_coroutine_threadsafe(
-                self.event_handler(data), self.loop
-            )
 
         except ValueError as ex:
             self.logger.error(
@@ -259,23 +223,7 @@ class SonoffLANModeClient:
                 format(ex),
             )
 
-            asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop
-            )
-
-        except TypeError as ex:
-            self.logger.error(
-                "Error updating service for device %s: %s"
-                " Probably missing API key.",
-                self.device_id,
-                format(ex),
-            )
-
-            asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop
-            )
-
-        except Exception as ex:
+        except Exception as ex:  # pragma: no cover
             self.logger.error(
                 "Error updating service for device %s: %s, %s",
                 self.device_id,
@@ -283,8 +231,11 @@ class SonoffLANModeClient:
                 traceback.format_exc(),
             )
 
+        finally:
+            # process the events on an event loop
+            # this method is on a background thread called from zeroconf
             asyncio.run_coroutine_threadsafe(
-                self.event_handler(None), self.loop
+                self.event_handler(data), self.loop
             )
 
     def retry_connection(self):
@@ -294,6 +245,9 @@ class SonoffLANModeClient:
                 self.logger.debug(
                     "Sending retry message for %s" % self.device_id
                 )
+
+                # in retry connection, we automatically retry 3 times
+                self.set_retries(3)
                 self.send_signal_strength()
                 self.logger.info(
                     "Service %s flagged for removal, but is still active!"
@@ -311,7 +265,7 @@ class SonoffLANModeClient:
                 self.close_connection()
                 break
 
-            except Exception as ex:
+            except Exception as ex:  # pragma: no cover
                 self.logger.error(
                     "Retry_connection() Unexpected error for device %s: %s %s",
                     self.device_id,
@@ -319,6 +273,10 @@ class SonoffLANModeClient:
                     traceback.format_exc(),
                 )
                 break
+
+            finally:
+                # set retires back to 0
+                self.set_retries(0)
 
     def send_switch(self, request: Union[str, Dict]):
 
@@ -344,7 +302,7 @@ class SonoffLANModeClient:
 
             return response
 
-        except Exception as ex:
+        except Exception as ex:  # pragma: no cover
             self.logger.error(
                 "error %s processing response: %s, %s",
                 format(ex),
@@ -408,16 +366,8 @@ class SonoffLANModeClient:
 
             self.logger.debug("params: %s", params)
 
-            if self.api_key != "" and self.api_key is not None:
-                sonoffcrypto.format_encryption_msg(
-                    payload, self.api_key, params
-                )
-                self.logger.debug("encrypted: %s", payload)
-
-            else:
-                self.logger.error(
-                    "missing api_key field for device: %s", self.device_id
-                )
+            sonoffcrypto.format_encryption_msg(payload, self.api_key, params)
+            self.logger.debug("encrypted: %s", payload)
 
         else:
             payload["encrypt"] = False
@@ -426,22 +376,43 @@ class SonoffLANModeClient:
 
         return payload
 
-    def parseAddress(self, address):
-        """
-        Resolve the IP address of the device
-        :param address:
-        :return: add_str
-        """
-        add_list = []
-        for i in range(4):
-            add_list.append(int(address.hex()[(i * 2): (i + 1) * 2], 16))
-        add_str = (
-            str(add_list[0])
-            + "."
-            + str(add_list[1])
-            + "."
-            + str(add_list[2])
-            + "."
-            + str(add_list[3])
+    def set_url(self, ip, port):
+
+        socket_text = ip + ":" + port
+        self.url = "http://" + socket_text
+        self.logger.debug("service is at %s", self.url)
+
+    def create_http_session(self):
+
+        # create an http session so we can use http keep-alives
+        self.http_session = requests.Session()
+
+        # add the http headers
+        # note the commented out ones are copies from the sniffed ones
+        headers = collections.OrderedDict(
+            {
+                "Content-Type": "application/json;charset=UTF-8",
+                # "Connection": "keep-alive",
+                "Accept": "application/json",
+                "Accept-Language": "en-gb",
+                # "Content-Length": "0",
+                # "Accept-Encoding": "gzip, deflate",
+                # "Cache-Control": "no-store",
+            }
         )
-        return add_str
+
+        # needed to keep headers in same order
+        # instead of self.http_session.headers.update(headers)
+        self.http_session.headers = headers
+
+    def set_retries(self, retry_count):
+
+        # no retries at moment, control in sonoffdevice
+        retries = Retry(
+            total=retry_count,
+            backoff_factor=0.5,
+            method_whitelist=["POST"],
+            status_forcelist=None,
+        )
+
+        self.http_session.mount("http://", HTTPAdapter(max_retries=retries))

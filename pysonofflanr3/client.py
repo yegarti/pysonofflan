@@ -47,8 +47,8 @@ class SonoffLANModeClient:
         timeout: int = DEFAULT_TIMEOUT,
         logger: logging.Logger = None,
         loop=None,
-        device_id: str = "",
-        api_key: str = "",
+        device_id: str = None,
+        api_key: str = None,
         outlet: int = None,
     ):
 

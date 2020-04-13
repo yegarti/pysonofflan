@@ -23,8 +23,8 @@ class SonoffDevice(object):
         ping_interval=SonoffLANModeClient.DEFAULT_PING_INTERVAL,
         timeout=SonoffLANModeClient.DEFAULT_TIMEOUT,
         context: str = None,
-        device_id: str = None,
-        api_key: str = None,
+        device_id: str = "",
+        api_key: str = "",
         outlet: int = None,
     ) -> None:
         """

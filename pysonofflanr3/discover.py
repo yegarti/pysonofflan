@@ -1,7 +1,7 @@
 import time
 from typing import Dict
 from datetime import datetime
-from zeroconf import ServiceBrowser, Zeroconf, ServiceListener
+from zeroconf import ServiceBrowser, Zeroconf
 from pysonofflanr3 import utils
 
 
@@ -26,10 +26,9 @@ class Discover:
         return listener.devices
 
 
-class MyListener(ServiceListener):
+class MyListener:
     def __init__(self):
 
-        self.logger = None
         self.devices = {}
 
     def add_service(self, zeroconf, type, name):

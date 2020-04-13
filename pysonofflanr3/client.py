@@ -43,9 +43,9 @@ class SonoffLANModeClient:
         self,
         host: str,
         event_handler: Callable[[str], Awaitable[None]],
-        logger: logging.Logger,
         ping_interval: int = DEFAULT_PING_INTERVAL,
         timeout: int = DEFAULT_TIMEOUT,
+        logger: logging.Logger = None,
         loop=None,
         device_id: str = None,
         api_key: str = None,
@@ -334,7 +334,6 @@ class SonoffLANModeClient:
 
         data = json.dumps(request, separators=(",", ":"))
         self.logger.debug("Sending http message to %s: %s", url, data)
-        assert self.http_session is not None
         response = self.http_session.post(url, data=data)
         self.logger.debug(
             "response received: %s %s", response, response.content
@@ -371,8 +370,8 @@ class SonoffLANModeClient:
             self.logger.debug("encrypted: %s", payload)
 
         else:
-            payload["encrypt"] = str(False)
-            payload["data"] = str(params)
+            payload["encrypt"] = False
+            payload["data"] = params
             self.logger.debug("message to send (plaintext): %s", payload)
 
         return payload

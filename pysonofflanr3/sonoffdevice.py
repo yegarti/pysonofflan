@@ -87,9 +87,9 @@ class SonoffDevice(object):
             self.client = SonoffLANModeClient(
                 host,
                 self.handle_message,
-                logger=self.logger,
                 ping_interval=ping_interval,
                 timeout=timeout,
+                logger=self.logger,
                 loop=self.loop,
                 device_id=device_id,
                 api_key=api_key,

@@ -109,16 +109,16 @@ Usage Example
 =======================
 ::
 
-    $ pysonofflan discover
+    $ pysonofflanr3 discover
     2019-01-31 00:45:32,074 - info: Attempting to discover Sonoff LAN Mode devices on the local network, please wait...
     2019-01-31 00:46:24,007 - info: Found Sonoff LAN Mode device at IP 192.168.0.77
 
-    $ pysonofflan --host 192.168.0.77 state
+    $ pysonofflanr3 --host 192.168.0.77 state
     2019-01-31 00:41:34,931 - info: Initialising SonoffSwitch with host 192.168.0.77
     2019-01-31 00:41:35,016 - info: == Device: 10006866e9 (192.168.0.77) ==
     2019-01-31 00:41:35,016 - info: State: OFF
 
-    $ pysonofflan --host 192.168.0.77 on
+    $ pysonofflanr3 --host 192.168.0.77 on
     2019-01-31 00:49:40,334 - info: Initialising SonoffSwitch with host 192.168.0.77
     2019-01-31 00:49:40,508 - info:
     2019-01-31 00:49:40,508 - info: Initial state:

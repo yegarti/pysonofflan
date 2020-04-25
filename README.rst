@@ -96,7 +96,7 @@ Command-Line Usage
                            Inching/Momentary switch.
       -l, --level LVL  Either CRITICAL, ERROR, WARNING, INFO or DEBUG
       --help               Show this message and exit.
-      --api_key KEY        Needed for devices not in DIY mode. See https://github.com/mattsaxon/pysonofflan/wiki/Finding-the-API__Key
+      --api_key KEY        Needed for devices not in DIY mode. See https://pysonofflanr3.readthedocs.io/encryption.html
       
     Commands:
       discover  Discover devices in the network

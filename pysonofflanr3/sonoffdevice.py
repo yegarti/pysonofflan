@@ -212,7 +212,7 @@ class SonoffDevice(object):
                         retry_count += 1
 
                 except asyncio.TimeoutError:
-                    self.logger.warn(
+                    self.logger.warning(
                         "Device: %s. "
                         "Update message not received in timeout period, retry",
                         self.device_id,
@@ -225,7 +225,7 @@ class SonoffDevice(object):
 
                 except OSError as ex:
                     if retry_count == 0:
-                        self.logger.warn(
+                        self.logger.warning(
                             "Connection issue for device %s: %s",
                             self.device_id,
                             format(ex),

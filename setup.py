@@ -11,7 +11,7 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=7.0', 'click_log', 'pycryptodome', 'requests', 'zeroconf>=0.24.5']
+requirements = ['Click>=7.0', 'click_log', 'pycryptodome', 'requests', 'zeroconf==0.26.1']
 setup_requirements = []
 test_requirements = ['pytest', 'tox', 'python-coveralls', 'flask', 'flake8']
 
